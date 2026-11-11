@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI 산업 보안 · AI产业安全 · AI Industry Security</title>
+<meta name="description" content="Edge-based wearable health AI security: regulation map, threat model, in-browser simulation with blocked 5-fold cross-validation / 엣지 웨어러블 헬스 AI 보안 / 边缘可穿戴健康AI安全">
+<style>
+:root{--bg:#f4f6fb;--cd:#fff;--tx:#17202e;--mu:#5a6678;--ac:#b5400a;--a2:#fdeee3;--bd:#d9e0ee;--ok:#16794a;--bad:#c2332b;--hd:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1420;--cd:#171e2d;--tx:#e8edf7;--mu:#9aa7bd;--ac:#ff9a5c;--a2:#3a2517;--bd:#2a3550;--ok:#4cd08a;--bad:#ff7a70;--hd:#0b1020}}
+*{box-sizing:border-box}html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 56px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.7 -apple-system,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR","PingFang SC","Microsoft YaHei","HarmonyOS Sans SC","MiSans",sans-serif;padding-bottom:env(safe-area-inset-bottom,0px)}
+header{background:var(--ac);color:var(--hd);padding:calc(22px + env(safe-area-inset-top,0px)) 16px 24px}
+.w{max-width:1000px;margin:0 auto;padding:0 16px}header .w{padding:0}
+h1{margin:0 0 6px;font-size:1.55rem;line-height:1.3}header p{margin:0;opacity:.93;font-size:.95rem}
+.badge{display:inline-block;margin-top:10px;padding:2px 12px;border:1px solid var(--hd);border-radius:20px;font-size:.8rem}
+.lang{display:flex;gap:8px;margin-top:12px}.lang button{min-height:44px;padding:0 16px;border-radius:22px;border:2px solid var(--hd);background:transparent;color:var(--hd);font:inherit;font-weight:700;cursor:pointer}.lang button.on{background:var(--hd);color:var(--ac)}
+nav{position:sticky;top:0;background:var(--cd);border-bottom:1px solid var(--bd);z-index:5;overflow-x:auto;white-space:nowrap;padding-top:env(safe-area-inset-top,0px)}
+nav a{display:inline-block;padding:12px 13px;color:var(--ac);text-decoration:none;font-weight:600;font-size:.92rem}
+section{margin:30px 0}h2{font-size:1.25rem;margin:0 0 4px;border-left:5px solid var(--ac);padding-left:10px}.sub{color:var(--mu);margin:0 0 12px;font-size:.93rem}
+.g{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.c{background:var(--cd);border:1px solid var(--bd);border-radius:12px;padding:14px 16px}.c b{display:block;margin-bottom:4px}.c span{color:var(--mu);font-size:.9rem}
+.st{background:var(--a2);border-radius:12px;padding:12px;text-align:center}.st b{display:block;font-size:1.4rem;color:var(--ac)}.st span{font-size:.8rem;color:var(--mu)}
+table{width:100%;border-collapse:collapse;font-size:.88rem;background:var(--cd)}th,td{border:1px solid var(--bd);padding:8px;text-align:left;vertical-align:top}th{background:var(--a2)}
+.sc{overflow-x:auto;border-radius:10px}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}.flow div{flex:1 1 150px;background:var(--a2);border:1px solid var(--bd);border-radius:10px;padding:10px;font-size:.88rem}.flow div b{display:block;color:var(--ac)}
+button.run{min-height:44px;padding:0 18px;border-radius:10px;border:0;background:var(--ac);color:var(--hd);font:inherit;font-weight:700;cursor:pointer;margin:4px 8px 4px 0}
+input[type=number]{min-height:44px;width:110px;border:1px solid var(--bd);border-radius:8px;padding:0 8px;font:inherit;background:var(--cd);color:var(--tx)}
+.ok{color:var(--ok);font-weight:700}.bad{color:var(--bad);font-weight:700}
+.warn{border-left:4px solid #c98a00;background:var(--cd);border-radius:8px;padding:10px 14px;font-size:.88rem;color:var(--mu);margin-top:12px}
+ul.l{padding-left:20px}ul.l li{margin:4px 0}a{color:var(--ac)}
+footer{color:var(--mu);font-size:.82rem;padding:16px 0 34px}
+.pl{text-decoration:none;color:var(--tx)}.pl b{color:var(--ac)}
+.seg{display:flex;flex-wrap:wrap;margin:8px 0}button.run.sc{background:var(--a2);color:var(--ac);border:2px solid var(--ac)}button.run.sc.sel{background:var(--ac);color:var(--hd)}
+.tiles{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));margin:10px 0}.st span{display:block}.st b{font-size:1.15rem}
+.pn{margin-top:10px}.rw{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:4px 0}
+.pill{padding:2px 16px;border-radius:20px;font-weight:700;color:#fff}.pill.l0{background:#16794a}.pill.l1{background:#9a6700}.pill.l2{background:#c2332b}
+.bar{height:10px;background:var(--a2);border-radius:6px;overflow:hidden;margin:6px 0}.bar i{display:block;height:100%;transition:width .4s}.bar i.l0{background:#16794a}.bar i.l1{background:#c98a00}.bar i.l2{background:#c2332b}
+.alarm{border:2px solid var(--bad);border-radius:10px;padding:10px 14px;margin-top:8px}.alarm pre{white-space:pre-wrap;word-break:break-all;font-size:.8rem;margin:6px 0}
+.cvw{max-width:340px}canvas#cv{width:100%;max-width:320px;aspect-ratio:4/3;background:#1d2530;border-radius:10px}
+button:focus-visible,a:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.wf{max-width:300px;margin:12px auto;background:#10151d;color:#fff;border-radius:36px;padding:22px;text-align:center;border:6px solid #3a4452}.wt{font-size:2.4rem;font-weight:700}.wa{background:#8e1f19;border-radius:14px;padding:10px;margin:8px 0}.wf button.run{width:100%;margin:4px 0}.wf button:disabled{opacity:.6}button.run.sosb{background:#c2332b;color:#fff}
+.mapw{display:flex;flex-wrap:wrap;gap:12px}.mapw svg{flex:2 1 320px;min-width:0;background:var(--cd,#fff);border-radius:12px;border:1px solid rgba(138,148,163,.4)}.mapw .c{flex:1 1 240px}.mapw .run{margin:2px}
+</style>
+</head>
+<body>
+<header><div class="w"><h1 id="h1"></h1><p id="hp"></p><span class="badge" id="bd"></span>
+<div class="lang"><button data-l="zh">中文</button><button data-l="en">English</button><button data-l="ko">한국어</button></div></div></header>
+<nav><div class="w" id="nav"></div></nav>
+<main class="w" id="app"></main>
+<div class="w"><footer id="ft"></footer></div>
+<script>
+//SIM-START
+function rng(s){return function(){s|=0;s=s+0x6D2B79F5|0;var t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function gauss(r){var u=0,v;while(u===0)u=r();v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+function mean(a){var s=0;for(var i=0;i<a.length;i++)s+=a[i];return a.length?s/a.length:0}
+function sd(a){var m=mean(a),s=0;for(var i=0;i<a.length;i++)s+=(a[i]-m)*(a[i]-m);return a.length?Math.sqrt(s/a.length):0}
+function gen(seed,N){
+ var r=rng(seed),S=[],act=0,i;
+ for(i=0;i<N;i++){
+  if(act<=0&&r()<0.01)act=15+Math.floor(r()*15);
+  var a=act>0?28:0;if(act>0)act--;
+  var hr=72+8*Math.sin(i/120)+a+gauss(r)*2.5;
+  S.push({seq:i,hr:hr,sbp:120+0.35*(hr-72)+gauss(r)*3,dbp:78+0.2*(hr-72)+gauss(r)*2,tp:36.6+0.1*Math.sin(i/200)+gauss(r)*0.06,sp:97.5+gauss(r)*0.5,y:0,type:0});
+ }
+ var pos=110;
+ while(pos<N-60){
+  if(r()<0.5){
+   var t=1+Math.floor(r()*4),L=18+Math.floor(r()*10),k,o=S.slice(0);
+   for(k=0;k<L;k++){
+    var s=S[pos+k];
+    if(t===1){var b=o[pos];s.hr=b.hr;s.sbp=b.sbp;s.dbp=b.dbp;s.tp=b.tp;s.sp=b.sp}
+    else if(t===2){s.tp+=0.045*(k+1)}
+    else if(t===3){s.sbp+=35;s.dbp+=15}
+    else{var q=o[pos-100+k];s.hr=q.hr;s.sbp=q.sbp;s.dbp=q.dbp;s.tp=q.tp;s.sp=q.sp;s.seq=r()<0.7?q.seq:s.seq}
+    s.y=1;s.type=t;
+   }
+   pos+=L+40+Math.floor(r()*60);
+  }else pos+=30;
+ }
+ return S;
+}
+function col(w,f){var o=[];for(var i=0;i<w.length;i++)o.push(w[i][f]);return o}
+function viol(s){
+ var v=0;
+ v+=Math.max(0,(40-s.hr)/40,(s.hr-140)/40);v+=Math.max(0,(90-s.sbp)/30,(s.sbp-180)/30);
+ v+=Math.max(0,(50-s.dbp)/20,(s.dbp-110)/20);v+=Math.max(0,(35.5-s.tp),(s.tp-38)/1);v+=Math.max(0,(92-s.sp)/5);
+ return v;
+}
+function feats(S,i){
+ var w=S.slice(Math.max(0,i-4),i+1),s=S[i];
+ var sd5=sd(col(w,"hr"))+sd(col(w,"sbp"))+10*sd(col(w,"tp"));
+ var bw=S.slice(Math.max(0,i-60),Math.max(1,i-34)),base=mean(col(bw,"tp"));
+ return [s.seq!==i?1:0,1/(1+5*sd5),Math.max(0,(s.tp-base)/0.3),Math.abs(s.sbp-(120+0.35*(s.hr-72)))/10,viol(s)];
+}
+function train(X,Y){
+ var d=X[0].length,n=X.length,w=[],j,i,e,pos=0;
+ for(j=0;j<=d;j++)w.push(0);
+ for(i=0;i<n;i++)pos+=Y[i];
+ var wp=(n-pos)/Math.max(1,pos);
+ for(e=0;e<300;e++){
+  var g=[];for(j=0;j<=d;j++)g.push(0);
+  for(i=0;i<n;i++){
+   var z=w[d];for(j=0;j<d;j++)z+=w[j]*X[i][j];
+   var p=1/(1+Math.exp(-z)),er=(p-Y[i])*(Y[i]?wp:1);
+   for(j=0;j<d;j++)g[j]+=er*X[i][j];g[d]+=er;
+  }
+  for(j=0;j<=d;j++)w[j]-=0.5*g[j]/n;
+ }
+ return w;
+}
+function score(w,x){var z=w[x.length];for(var j=0;j<x.length;j++)z+=w[j]*x[j];return 1/(1+Math.exp(-z))}
+function metr(c){var p=c.tp/Math.max(1,c.tp+c.fp),r=c.tp/Math.max(1,c.tp+c.fn);return{p:p,r:r,f1:(p+r)?2*p*r/(p+r):0,fpr:c.fp/Math.max(1,c.fp+c.tn)}}
+function runCV(seed,N,K){
+ K=K||5;var S=gen(seed,N),F=[],Y=[],i,k;
+ for(i=0;i<N;i++){F.push(feats(S,i));Y.push(S[i].y)}
+ var folds=[],bt=[0,0,0,0,0],bn=[0,0,0,0,0];
+ for(k=0;k<K;k++){
+  var a=Math.floor(k*N/K),b=Math.floor((k+1)*N/K),Xtr=[],Ytr=[];
+  for(i=0;i<N;i++){if(i<a-20||i>=b+20){Xtr.push(F[i]);Ytr.push(Y[i])}}
+  var m=[],sdv=[],j,d=F[0].length;
+  for(j=0;j<d;j++){var c=[];for(i=0;i<Xtr.length;i++)c.push(Xtr[i][j]);m.push(mean(c));sdv.push(sd(c)||1)}
+  function nz(x){var o=[];for(var q=0;q<d;q++)o.push((x[q]-m[q])/sdv[q]);return o}
+  var w=train(Xtr.map(nz),Ytr),cm={tp:0,fp:0,fn:0,tn:0},cr={tp:0,fp:0,fn:0,tn:0},ty={1:[0,0],2:[0,0],3:[0,0],4:[0,0]};
+  for(i=a;i<b;i++){
+   var pr=score(w,nz(F[i]))>=0.5?1:0,rl=F[i][4]>0?1:0,y=Y[i];
+   if(pr&&y)cm.tp++;else if(pr&&!y)cm.fp++;else if(!pr&&y)cm.fn++;else cm.tn++;
+   if(rl&&y)cr.tp++;else if(rl&&!y)cr.fp++;else if(!rl&&y)cr.fn++;else cr.tn++;
+   if(y){ty[S[i].type][1]++;if(pr)ty[S[i].type][0]++}
+  }
+  folds.push({m:metr(cm),rule:metr(cr),ty:ty,alerts:cm.tp+cm.fp});
+ }
+ var alerts=0;for(k=0;k<K;k++)alerts+=folds[k].alerts;
+ return{folds:folds,alerts:alerts,N:N};
+}
+function agg(fs,key,sub){var v=fs.map(function(f){return sub?f[sub][key]:f[key]});return{m:mean(v),s:sd(v)}}
+function multi(n,N){var out=[],i;for(i=1;i<=n;i++){var r=runCV(i,N),f=r.folds.map(function(x){return x.m.f1});out.push(mean(f))}return{m:mean(out),s:sd(out),min:Math.min.apply(null,out),max:Math.max.apply(null,out),n:n}}
+//SIM-END
+
+var L=["zh","en","ko"],cur=2;
+var T={
+h1:["AI产业安全｜可穿戴 + 摄像头 + AI 融合平台","AI Industry Security: Wearable + Camera + AI Fusion","AI 산업 보안｜웨어러블 + 카메라 + AI 융합 플랫폼"],
+hp:["智能手表采集血压、体温等生物数据，在边缘计算机上本地处理；以法规、威胁模型与可复现的交叉验证为依据","Smartwatch vitals (blood pressure, temperature) processed on an edge computer, backed by regulation mapping, a threat model and reproducible cross-validation","스마트워치의 혈압·체온 등 생체데이터를 엣지 컴퓨터에서 처리: 규제 지도, 위협 모델, 재현 가능한 교차검증 기반"],
+bd:["CES 2028 参赛版 · 可交互演示","CES 2028 entry · interactive demo","CES 2028 출품작 · 인터랙티브 데모"],
+ft:["免责声明：本页仿真使用合成数据，结果不代表真实设备或临床性能；摄像头画面只在浏览器本地处理，不上传。非医疗建议，不构成法律意见。法规状态请以官方文本为准（欧盟 Digital Omnibus 为 2026 年 5 月临时协议，正式生效情况需核实）。","Disclaimer: the simulation uses synthetic data; results do not represent real-device or clinical performance. Camera frames are processed only in your browser and never uploaded. Not medical or legal advice. Check official texts for regulatory status (the EU Digital Omnibus was a provisional agreement in May 2026; confirm formal adoption).","면책: 이 시뮬레이션은 합성 데이터를 사용하며 실제 기기·임상 성능을 의미하지 않습니다. 카메라 영상은 브라우저에서만 처리되며 업로드되지 않습니다. 의료·법률 조언이 아닙니다. 규제 현황은 공식 원문으로 확인하세요(EU Digital Omnibus는 2026년 5월 잠정 합의이므로 정식 채택 여부 확인 필요)."]};
+var NAV=[["land",["现状","Landscape","동향"]],["reg",["法规地图","Regulation","규제 지도"]],["arch",["边缘架构","Edge design","엣지 설계"]],["live",["实时监测","Live","실시간"]],["vision",["摄像头","Camera","카메라"]],["map",["厂区地图","Floor map","공장 지도"]],["ctr",["考勤与分区","Attendance & zones","출근·구역"]],["dsp",["10秒应急","10-s dispatch","10초 대응"]],["rec",["恢复运动","Recovery","회복 운동"]],["app2",["App化","App-ready","앱 전환"]],["val",["验证结果","Validation","검증 결과"]],["vcam",["摄像头验证","Camera check","카메라 검증"]],["vpos",["定位验证","Positioning","측위 검증"]],["lim",["局限","Limits","한계"]],["sim",["仿真与验证","Simulation","시뮬레이션"]],["road",["CES 2028 路线","Roadmap","로드맵"]],["case",["案例","Case study","사례"]],["src",["文献来源","Sources","참고문헌"]]];
+var SEC={
+land:{t:["全球现状","Global landscape","글로벌 동향"],s:["最新国际评估与各国立法节点","Latest international assessment and national milestones","최신 국제 평가와 각국 입법 일정"],
+ st:[["100+",["位专家（2026国际AI安全报告）","experts (Intl. AI Safety Report 2026)","전문가(2026 국제 AI 안전 보고서)"]],["2026.1.22",["韩国《AI基本法》生效","Korea AI Basic Act in force","한국 AI 기본법 시행"]],["2027.12 / 2028.8",["欧盟高风险AI适用日（临时协议）","EU high-risk dates (provisional)","EU 고위험 AI 적용일(잠정)"]],["2025.9.1",["中国AI生成内容标识办法生效","China AI labeling in force","중국 AI 생성물 표시 시행"]]],
+ txt:["2026 年国际 AI 安全报告（2026年2月3日）指出：深度伪造事件上升，攻击工具在地下市场被打包出售，且“评估差距”——受控测试表现与真实部署行为之间的差距——仍是核心挑战。","The International AI Safety Report 2026 (3 Feb 2026) notes rising deepfake incidents, pre-packaged attack tools sold underground, and a persistent evaluation gap between controlled tests and real-world behaviour.","2026 국제 AI 안전 보고서(2026.2.3)는 딥페이크 사고 증가, 지하시장의 공격 도구 패키지 판매, 통제된 시험과 실제 운영 사이의 ‘평가 격차’를 핵심 과제로 지적합니다."]},
+reg:{t:["法规地图","Regulation map","규제 지도"],s:["与可穿戴健康AI最相关的要点","Points most relevant to wearable health AI","웨어러블 헬스 AI와 가장 관련 깊은 요점"],
+ head:[["地区","Region","지역"],["状态","Status","현황"],["对本项目的含义","Implication","본 프로젝트 시사점"]],
+ rows:[
+ [["国际","International","국제"],["2026国际AI安全报告（2026.2）","International AI Safety Report 2026 (Feb 2026)","2026 국제 AI 안전 보고서(2026.2)"],["把“评估差距”作为设计前提：必须做真实设备验证","Treat the evaluation gap as a design premise: real-device validation is mandatory","평가 격차를 설계 전제로: 실제 기기 검증 필수"]],
+ [["韩国","Korea","한국"],["AI基本法 2026.1.22 生效；高影响AI含医疗、生物识别分析；罚款至少有一年宽限期","AI Basic Act in force 22 Jan 2026; high-impact AI includes healthcare and biometric analysis; at least one-year fine grace period","AI 기본법 2026.1.22 시행. 고영향 AI에 의료·생체분석 포함. 과태료 최소 1년 유예"],["事前告知AI使用、风险管理方案、人工监督、文档与记录","Advance AI-use notice, risk management plan, human oversight, documentation and records","AI 사용 사전 고지, 위험관리 계획, 인간 감독, 문서·기록"]],
+ [["欧盟","EU","EU"],["Digital Omnibus 临时协议（2026.5.7）：独立高风险 2027.12.2；产品嵌入式（含医疗器械）2028.8.2","Digital Omnibus provisional deal (7 May 2026): standalone high-risk 2 Dec 2027; product-embedded (incl. medical devices) 2 Aug 2028","Digital Omnibus 잠정 합의(2026.5.7): 독립형 고위험 2027.12.2, 제품 내장형(의료기기 포함) 2028.8.2"],["与 CES 2028 时间点相邻：应按高风险要求提前准备","Close to the CES 2028 timeline: prepare to high-risk standards early","CES 2028 시점과 근접: 고위험 기준으로 선제 준비"]],
+ [["中国","China","중국"],["AI生成合成内容标识办法 2025.9.1 生效；《AI安全治理框架2.0》（2025.9）","AI-generated content labeling measures in force 1 Sep 2025; AI Safety Governance Framework 2.0 (Sep 2025)","AI 생성물 표시 办法 2025.9.1 시행, AI 안전 거버넌스 프레임워크 2.0(2025.9)"],["进入中国市场需显式+隐式标识与可追溯","Explicit and implicit labels plus traceability for the Chinese market","중국 시장은 명시·암시 표시 및 추적성 필요"]]]},
+arch:{t:["边缘安全架构","Edge security architecture","엣지 보안 아키텍처"],s:["智能手表 → 边缘计算机 → 仅上传告警/聚合数据","Smartwatch → edge computer → only alerts/aggregates leave","스마트워치 → 엣지 컴퓨터 → 경보·집계만 외부 전송"],
+ flow:[[["智能手表","Smartwatch","스마트워치"],["血压、体温、心率、血氧；签名固件、BLE 安全配对、包序号+MAC","BP, temperature, HR, SpO2; signed firmware, secure BLE pairing, packet counter + MAC","혈압·체온·심박·SpO2, 서명 펌웨어, BLE 보안 페어링, 패킷 카운터+MAC"]],
+ [["边缘计算机","Edge computer","엣지 컴퓨터"],["本地推理；原始数据不出本地，静态加密","Local inference; raw data stays local, encrypted at rest","로컬 추론, 원시 데이터 외부 반출 없음, 저장 암호화"]],
+ [["可信度引擎","Plausibility engine","신뢰도 엔진"],["生理范围、信号间一致性、平坦度、漂移、序号校验（下方仿真）","Physiological range, cross-signal consistency, flatness, drift, sequence check (simulated below)","생리 범위, 신호 간 일관성, 평탄도, 드리프트, 시퀀스 검사(아래 시뮬레이션)"]],
+ [["输出闸门","Output gate","출력 게이트"],["低质量时不显示数值；非诊断声明；异常升级给人工","Withhold values on low quality; non-diagnostic notice; human escalation","저품질 시 수치 보류, 비진단 고지, 사람에게 에스컬레이션"]],
+ [["云/治理","Cloud / governance","클라우드·거버넌스"],["仅告警与聚合；审计日志；威胁建模、SBOM、渗透测试、影响评估","Alerts and aggregates only; audit logs; threat model, SBOM, pen test, impact assessment","경보·집계만 전송, 감사 로그, 위협 모델·SBOM·모의해킹·영향평가"]]],
+ warn:["注意：无袖带智能手表的血压估计精度仍是公认难题，在完成参考设备验证前应标注为趋势/估计值。","Caution: cuffless smartwatch blood-pressure estimation remains a known accuracy challenge; label it a trend/estimate until validated against a reference device.","주의: 커프리스 스마트워치 혈압 추정은 정확도 문제가 알려져 있으므로, 기준기기 검증 전에는 추세·추정치로 표시해야 합니다."]},
+sim:{t:["内部仿真与交叉验证","Internal simulation & cross-validation","내부 시뮬레이션·교차검증"],s:["在浏览器中本地运行：合成生命体征 + 4 类攻击 + 分块5折交叉验证（可复现随机种子）","Runs locally in your browser: synthetic vitals + 4 attack types + blocked 5-fold cross-validation (seeded, reproducible)","브라우저에서 로컬 실행: 합성 생체신호 + 공격 4종 + 블록형 5-폴드 교차검증(시드 고정·재현 가능)"]}
+};
+var UI={seed:["随机种子","Seed","시드"],n:["样本数","Samples","샘플 수"],run:["运行5折验证","Run 5-fold CV","5-폴드 검증 실행"],multi:["10个种子稳健性","10-seed robustness","10-시드 강건성"],fold:["折","Fold","폴드"],mod:["模型 F1","Model F1","모델 F1"],rule:["范围规则 F1","Range-rule F1","범위규칙 F1"],prec:["精确率","Precision","정밀도"],rec:["召回率","Recall","재현율"],fpr:["误报率","False-alarm rate","오경보율"],types:["按攻击类型召回","Recall by attack type","공격 유형별 재현율"],tn:[["冻结值","Frozen values","값 고정"],["体温漂移","Temp. drift","체온 드리프트"],["信号不一致","Inconsistency","신호 불일치"],["重放","Replay","재전송"]],mean:["均值±标准差","mean ± SD","평균±표준편차"],ms:["原始流量→上传量","Raw → uploaded","원시 → 업로드"],red:["数据最小化：上传量约减少","Data minimization: upload reduced by about","데이터 최소화: 업로드 약"],ro:["多种子结果","Multi-seed result","다중 시드 결과"],note:["解读：基线规则只检查范围，攻击者保持在正常范围内时几乎检测不到；重放中序号被伪造的部分只能靠 MAC/计数器加密校验解决。这是合成数据结果，真实设备数据必须另行验证。","Reading: the baseline only checks ranges, so in-range attacks slip through; replay with forged counters needs cryptographic MAC/counter checks. These are synthetic-data results; real-device data must be validated separately.","해석: 기준 규칙은 범위만 검사하므로 정상 범위 내 공격은 놓칩니다. 카운터가 위조된 재전송은 MAC·카운터 암호 검증이 필요합니다. 합성 데이터 결과이며 실제 기기 데이터는 별도 검증해야 합니다."],
+ steps:["检测器：逻辑回归，5个特征（序号、平坦度、体温漂移、血压-心率一致性、范围）；分块折+前后各20样本隔离，避免时间泄漏。","Detector: logistic regression on 5 features (sequence, flatness, temperature drift, BP–HR consistency, range); contiguous folds with a 20-sample purge on each side to avoid temporal leakage.","탐지기: 로지스틱 회귀, 특징 5개(시퀀스, 평탄도, 체온 드리프트, 혈압-심박 일관성, 범위). 시간 누수 방지를 위해 연속 폴드와 양쪽 20샘플 제외."]};
+var ROAD={t:["CES 2028 准备路线","CES 2028 readiness roadmap","CES 2028 준비 로드맵"],s:["以可验证的关卡推进；时间表仅为建议","Gate-based and verifiable; dates are suggestions only","검증 가능한 관문 중심, 일정은 제안일 뿐입니다"],
+ it:[["① 合成仿真 + 分块交叉验证（本页，已完成）","① Synthetic simulation + blocked cross-validation (this page, done)","① 합성 시뮬레이션 + 블록 교차검증(본 페이지, 완료)"],
+ ["② 真实设备台架验证：智能手表对比参考设备（袖带血压、临床体温计、心电胸带），至少15–20人、不同肤色与光照，Bland-Altman、MAE、CCC","② Real-device bench validation vs reference devices (cuff BP, clinical thermometer, ECG strap), at least 15–20 people with varied skin tone and lighting; Bland-Altman, MAE, CCC","② 실기기 검증: 기준기기(커프 혈압, 임상 체온계, 심전도 스트랩) 대비, 피부톤·조명 다양한 15–20명 이상, Bland-Altman·MAE·CCC"],
+ ["③ 安全测试：BLE 链路红队（重放、欺骗、漂移注入）、边缘加固、渗透测试、SBOM","③ Security testing: BLE red-team (replay, spoofing, drift injection), edge hardening, pen test, SBOM","③ 보안 시험: BLE 레드팀(재전송·스푸핑·드리프트 주입), 엣지 하드닝, 모의해킹, SBOM"],
+ ["④ 合规与伦理：判定是否属韩国“高影响AI”、欧盟高风险；确认医疗器械路径（MFDS/CE/FDA）；伦理审查","④ Compliance and ethics: determine Korea high-impact / EU high-risk status; confirm medical-device pathway (MFDS/CE/FDA); ethics review","④ 규제·윤리: 한국 고영향 AI·EU 고위험 해당 판단, 의료기기 경로(MFDS/CE/FDA) 확인, 윤리 심의"],
+ ["⑤ 展位演示包：实时仪表盘、攻击演示、可复现验证报告与风险披露","⑤ Booth demo kit: live dashboard, attack demo, reproducible validation report and risk disclosure","⑤ 전시 데모: 실시간 대시보드, 공격 시연, 재현 가능한 검증 보고서와 위험 공개"]]};
+var CASE={t:["案例：VitalLens 的安全设计","Case study: VitalLens safety-by-design","사례: VitalLens 안전 설계"],s:["来自庆云大学康复治疗专业课程项目报告","From the Kyungwoon University rehabilitation course project report","경운대학교 재활치료전공 과제 보고서 기반"],
+ it:[["风险分层入驻：依据远程康复安全性系统评价（不良事件约0.3%）","Risk-stratified onboarding, based on the telerehabilitation safety review (adverse events about 0.3%)","위험 층화 온보딩: 원격재활 안전성 체계적 문헌고찰 근거(유해사례 약 0.3%)"],["信号质量门控：SNR 低时保留数值，不输出","Signal-quality gating: withhold values when SNR is low","신호 품질 게이팅: SNR이 낮으면 값을 보류"],["诚实披露：目前仅为合成信号交叉验证，尚无真人实测；非诊断设备","Honest disclosure: so far only synthetic cross-validation, no human measurement yet; not a diagnostic device","정직한 공개: 현재 합성 신호 교차검증 단계, 실측 없음, 진단기기 아님"]]};
+var SRC=[["https://internationalaisafetyreport.org","International AI Safety Report 2026"],["https://www.trade.gov/market-intelligence/south-korea-ai-basic-act","US ITA: South Korea AI Basic Act"],["https://www.cooley.com/news/insight/2026/2026-01-27-south-koreas-ai-basic-act-overview-and-key-takeaways","Cooley: Korea AI Basic Act overview (Jan 2026)"],["https://law.asia/korea-ai-basic-act-characteristics-significance/","Law.asia: Korea AI Basic Act characteristics"],["https://www.gibsondunn.com/wp-content/uploads/2026/05/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes.pdf","Gibson Dunn: EU AI Act Omnibus agreement (May 2026)"],["https://cms.law/en/gbr/publication/the-eu-s-digital-omnibus-on-ai-what-the-provisional-agreement-really-changes","CMS: Digital Omnibus on AI"],["https://cms.law/en/chn/legal-updates/china-releases-ai-content-labeling-rules","CMS: China AI content labeling rules"],["https://www.mofo.com/artificial-intelligence/china","MoFo: China AI regulation tracker"],["https://doi.org/10.2196/68681","Shnitzer et al. 2025, JMIR Rehabil Assist Technol: Safety of Telerehabilitation"],["https://doi.org/10.1177/20552076261426622","Vermunicht et al. 2026, Digital Health: ML artefact removal in PPG wearable HR data"],["https://doi.org/10.1177/20552076251393295","Chien et al. 2025, Digital Health: AI-driven home pulmonary telerehabilitation system"],["https://doi.org/10.3390/s21248357","Tohma et al. 2021, Sensors: rPPG conditions for telemedicine"]];
+var UI2={
+pil:[["三大支柱","Three pillars","세 가지 축"],[[["可穿戴监测","Wearable monitoring","웨어러블 모니터링"],["智能手表采集心率、血压、体温、血氧，在边缘端本地分析","Smartwatch streams HR, BP, temperature and SpO2 for local edge analysis","스마트워치가 심박·혈압·체온·SpO2를 수집, 엣지에서 로컬 분석"],"live"],[["摄像头视觉检查","Camera vision check","카메라 비전 점검"],["检查安全帽佩戴与人员状态，画面不出设备","Checks helmet use and worker presence; frames never leave the device","안전모 착용·작업자 상태 확인, 영상은 기기 밖으로 나가지 않음"],"vision"],[["AI融合决策","AI fusion decision","AI 융합 판단"],["融合生理、视觉与跌倒信号，输出风险等级、原因解释与自动呼救","Fuses physiology, vision and fall signals into a risk level, explanation and automatic emergency call","생체·비전·낙상 신호를 융합해 위험 등급·설명·자동 신고"],"live"]]],
+lt:["实时监测与AI融合决策","Live monitoring & AI fusion","실시간 모니터링·AI 융합 판단"],
+ls:["选择场景，观察风险等级、原因解释和自动呼救流程（合成数据）","Pick a scenario to watch the risk level, explanation and emergency-call flow (synthetic data)","시나리오를 고르면 위험 등급·원인 설명·자동 신고 흐름을 볼 수 있습니다(합성 데이터)"],
+sc:[["正常作业","Normal work","정상 작업"],["高温中暑前兆","Heat stress","열 스트레스"],["心脏异常","Cardiac event","심장 이상"],["跌倒且不动","Fall, motionless","낙상·무동작"]],
+lb:[["心率","Heart rate","심박"],["血压","Blood pressure","혈압"],["体温","Temperature","체온"],["血氧","SpO2","SpO2"],["安全帽","Helmet","안전모"]],
+hs:[["已佩戴","Worn","착용"],["未佩戴","Missing","미착용"],["未检测","Not checked","미확인"]],
+lv:[["安全","Safe","안전"],["关注","Watch","주의"],["危险","Danger","위험"]],
+rk:["融合风险指数","Fused risk index","융합 위험 지수"],
+why:["AI解释","AI explanation","AI 설명"],
+rs:[["心率异常","Abnormal heart rate","심박 이상"],["血压异常","Abnormal blood pressure","혈압 이상"],["体温过高","Elevated body temperature","체온 상승"],["血氧偏低","Low oxygen saturation","산소포화도 저하"],["检测到跌倒且无动作","Fall detected, no movement","낙상 감지·무동작"],["未检测到安全帽","Helmet not detected","안전모 미감지"]],
+nr:["无异常信号","No abnormal signal","이상 신호 없음"],
+cd:["请确认安全，否则 {n} 秒后自动呼救","Confirm you are OK, or an emergency call starts in {n} s","안전하면 확인을 누르세요. {n}초 후 자동 신고"],
+okb:["我没事","I’m OK","괜찮아요"],
+emg:["已触发自动呼救（模拟）：只发送告警，不含原始生理数据","Emergency call triggered (simulated): alert only, no raw vitals sent","자동 신고 발동(시뮬레이션): 경보만 전송, 원시 생체데이터 미전송"],
+rst:["解除并复位","Clear and reset","해제 및 초기화"],
+ln:["引擎：规则 + 加权融合（演示）；正式产品可替换为经真实数据训练和验证的模型。数据为合成，非医疗建议。","Engine: rules plus weighted fusion (demo); a product would swap in a model trained and validated on real data. Data is synthetic, not medical advice.","엔진: 규칙+가중 융합(데모). 제품에서는 실제 데이터로 학습·검증한 모델로 교체합니다. 합성 데이터이며 의료 조언이 아닙니다."],
+vt:["摄像头视觉检查","Camera vision check","카메라 비전 점검"],
+vs:["在浏览器本地分析画面，识别头部区域的安全帽颜色，不上传任何画面","Frames are analysed locally in your browser; helmet colour is checked in the head region and nothing is uploaded","영상은 브라우저에서 로컬 분석되며 머리 영역의 안전모 색을 확인합니다. 업로드되지 않습니다"],
+vb:[["开启摄像头","Start camera","카메라 시작"],["演示场景","Demo scene","데모 장면"],["切换安全帽","Toggle helmet","안전모 전환"],["停止","Stop","중지"]],
+nc:["无法使用摄像头（权限或设备），请改用演示场景","Camera unavailable (permission or device); use the demo scene","카메라를 사용할 수 없습니다(권한·기기). 데모 장면을 이용하세요"],
+np:["未检测到人员（请在镜头前稍微移动）","No person detected (move slightly in front of the camera)","작업자 미감지(카메라 앞에서 조금 움직여 보세요)"],
+vn:["说明：这是颜色启发式演示（黄、橙、红、蓝色头盔）。正式产品应在边缘计算机上运行 MediaPipe/YOLO 类模型，并用真实现场数据验证。","Note: a colour-heuristic demo (yellow, orange, red or blue helmets). A product would run a MediaPipe/YOLO-class model on the edge computer, validated on real site data.","참고: 색상 휴리스틱 데모입니다(노랑·주황·빨강·파랑 안전모). 제품에서는 엣지 컴퓨터에서 MediaPipe/YOLO 계열 모델을 쓰고 실제 현장 데이터로 검증해야 합니다."]
+};
+var SCN=[{hr:78,sbp:122,dbp:78,tp:36.7,sp:98,fall:0},{hr:122,sbp:140,dbp:88,tp:38.7,sp:96,fall:0},{hr:154,sbp:88,dbp:55,tp:36.8,sp:90,fall:0},{hr:108,sbp:112,dbp:72,tp:36.9,sp:97,fall:1}];
+var LV={sc:0,v:{hr:78,sbp:122,dbp:78,tp:36.7,sp:98},hist:[],fall:0,helmet:null,cd:-1,ack:false,emg:false,risk:0,lvl:0,rs:[]};
+var VS={mode:0,stream:null,prev:null,box:null,seen:0,demoHelmet:true,tk:0};
+function cl(x){return Math.max(0,Math.min(1,x))}
+function pilHTML(){var P=UI2.pil;return '<section id="pil"><h2>'+t(P[0])+'</h2><div class="g">'+P[1].map(function(x){return '<a class="c pl" href="#'+x[2]+'"><b>'+t(x[0])+'</b><span>'+t(x[1])+'</span></a>'}).join("")+'</div></section>'}
+function liveHTML(){var U=UI2;return '<section id="live"><h2>'+t(U.lt)+'</h2><p class="sub">'+t(U.ls)+'</p><div><button class="run" data-sir="t">'+t(U6.st)+'</button><button class="run" data-sir="m">'+t(U6[SIR.on?"so":"sf"])+'</button></div><div class="seg" role="group">'+U.sc.map(function(x,i){return '<button class="run sc" data-i="'+i+'">'+t(x)+'</button>'}).join("")+'</div>'+
+'<div class="g tiles">'+[0,1,2,3,4].map(function(i){return '<div class="st"><span>'+t(U.lb[i])+'</span><b id="tv'+i+'">-</b></div>'}).join("")+'</div>'+
+'<div class="c pn"><div class="rw"><span class="pill" id="lvp"></span><span>'+t(U.rk)+' <b id="rkv"></b></span></div><div class="bar"><i id="rkb"></i></div><svg id="spk" viewBox="0 0 400 70" width="100%" role="img" aria-label="HR"></svg>'+
+'<p class="rw"><b>'+t(U.why)+'</b></p><ul class="l" id="rsl"></ul><div id="act"></div></div><div class="warn">'+t(U.ln)+'</div></section>'}
+function visionHTML(){var U=UI2,b=U.vb;return '<section id="vision"><h2>'+t(U.vt)+'</h2><p class="sub">'+t(U.vs)+'</p><div><button class="run" id="vb0">'+t(b[0])+'</button><button class="run" id="vb1">'+t(b[1])+'</button><button class="run" id="vb2">'+t(b[2])+'</button><button class="run" id="vb3">'+t(b[3])+'</button><button class="run" id="vb4">'+t(U6.pre)+'</button><button class="run" id="vb5">'+t(U6.cv)+'</button></div><div class="cvw"><canvas id="cv" width="320" height="240" role="img" aria-label="camera"></canvas><video id="vid" playsinline muted hidden></video></div><p id="vst" aria-live="polite"></p><p id="vck" aria-live="polite"></p><div class="warn">'+t(U.vn)+'</div></section>'}
+function riskCalc(){var v=LV.v,c=[cl(Math.max((v.hr-100)/40,(50-v.hr)/20)),cl(Math.max((v.sbp-150)/30,(100-v.sbp)/30)),cl((v.tp-37.5)/1),cl((95-v.sp)/5)],mx=0,sm=0,i,rs=[];
+for(i=0;i<4;i++){sm+=c[i];if(c[i]>mx)mx=c[i];if(c[i]>0.25)rs.push(i)}
+var r=Math.min(1,mx+0.25*(sm-mx));if(LV.fall){r+=0.6;rs.push(4)}if(LV.helmet===false){r+=0.15;rs.push(5)}
+LV.risk=cl(r);LV.rs=rs;LV.lvl=LV.risk>=0.6?2:LV.risk>=0.3?1:0}
+function tickLV(){var T0=SCN[LV.sc],v=LV.v,nz={hr:1.2,sbp:1.5,dbp:1,tp:0.03,sp:0.3},k;
+for(k in nz){v[k]+=(T0[k]-v[k])*0.18+(Math.random()-0.5)*2*nz[k]}
+if(LV.sc===2)v.hr+=(Math.random()-0.5)*14;
+LV.fall=T0.fall;LV.hist.push(v.hr);if(LV.hist.length>40)LV.hist.shift();riskCalc();
+if(LV.lvl===2&&!LV.emg&&!LV.ack){if(LV.cd<0)LV.cd=10;else{LV.cd--;if(LV.cd<=0){LV.emg=true;LV.cd=-1;siren()}}}
+else if(LV.lvl<2&&!LV.emg){LV.cd=-1;LV.ack=false}
+paintLV()}
+function paintLV(){var U=UI2,v=LV.v,e=document.getElementById("tv0");if(!e)return;
+function s(i,x){document.getElementById("tv"+i).textContent=x}
+s(0,v.hr.toFixed(0)+" bpm");s(1,v.sbp.toFixed(0)+"/"+v.dbp.toFixed(0));s(2,v.tp.toFixed(1)+" °C");s(3,v.sp.toFixed(0)+" %");
+s(4,t(U.hs[LV.helmet===true?0:LV.helmet===false?1:2]));
+var lvl=LV.emg?2:LV.lvl,p=document.getElementById("lvp");p.textContent=t(U.lv[lvl]);p.className="pill l"+lvl;
+document.getElementById("rkv").textContent=(LV.risk*100).toFixed(0)+" / 100";
+var b=document.getElementById("rkb");b.style.width=(LV.risk*100)+"%";b.className="l"+lvl;
+var h=LV.hist,mn=Math.min.apply(null,h.concat([60])),mxv=Math.max.apply(null,h.concat([100])),pts=h.map(function(y,i){return (i*400/39).toFixed(1)+","+(64-(y-mn)/(mxv-mn)*58).toFixed(1)}).join(" ");
+document.getElementById("spk").innerHTML='<polyline points="'+pts+'" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linejoin="round"/>';
+document.getElementById("rsl").innerHTML=(LV.rs.length?LV.rs:[-1]).map(function(i){return '<li>'+(i<0?t(U.nr):t(U.rs[i])+sfx(i))+'</li>'}).join("");
+var a=document.getElementById("act"),H="";
+if(LV.emg){H='<div class="alarm"><b>'+t(U.emg)+'</b><pre>{"worker":"W-017","zone":"Line 3 / B","level":"danger","risk":'+LV.risk.toFixed(2)+',"reasons":['+LV.rs.map(function(i){return '"'+U.rs[i][1]+'"'}).join(",")+']}</pre><button class="run" id="rsb">'+t(U.rst)+'</button></div>'}
+else if(LV.cd>=0){H='<div class="alarm"><b>'+t(U.cd).replace("{n}",LV.cd)+'</b><br><button class="run" id="okb">'+t(U.okb)+'</button></div>'}
+if(a.getAttribute("data-h")!==H){a.setAttribute("data-h",H);a.innerHTML=H;var o=document.getElementById("okb"),r=document.getElementById("rsb");
+if(o)o.onclick=function(){LV.ack=true;LV.cd=-1;paintLV()};if(r)r.onclick=function(){setSc(0)}}
+else if(LV.cd>=0){var ob=a.querySelector("b");if(ob)ob.textContent=t(U.cd).replace("{n}",LV.cd)}}
+function setSc(i){LV.sc=i;LV.ack=false;LV.emg=false;LV.cd=-1;var bs=document.querySelectorAll("button.sc");for(var k=0;k<bs.length;k++)bs[k].className="run sc"+(k===i?" sel":"");tickLV()}
+function bindLV(){var bs=document.querySelectorAll("button.sc");for(var k=0;k<bs.length;k++)(function(b){b.onclick=function(){setSc(+b.getAttribute("data-i"))}})(bs[k]);
+for(k=0;k<bs.length;k++)bs[k].className="run sc"+(k===LV.sc?" sel":"");
+var d=function(i,f){document.getElementById("vb"+i).onclick=f};d(0,camStart);d(1,demoStart);d(2,function(){VS.demoHelmet=!VS.demoHelmet});d(3,vStop);d(4,chkStart);d(5,function(){VS.cover=!VS.cover});LV.hist=LV.hist.slice();}
+function hsv(r,g,b){var mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn,h=0;if(d){if(mx===r)h=60*(((g-b)/d)%6);else if(mx===g)h=60*((b-r)/d+2);else h=60*((r-g)/d+4)}if(h<0)h+=360;return[h,mx?d/mx:0,mx/255]}
+function drawDemo(c){var w=320,h=240,j=Math.sin(VS.tk/6)*3;c.fillStyle="#cfd8e3";c.fillRect(0,0,w,h);c.fillStyle="#9aa7b8";c.fillRect(0,190,w,50);
+c.fillStyle="#e4572e";c.fillRect(120+j,110,80,100);c.fillStyle="#f2f2f2";c.fillRect(150+j,110,20,100);
+c.fillStyle="#e0b48f";c.beginPath();c.arc(160+j,84,26,0,7);c.fill();
+if(VS.demoHelmet){c.fillStyle="#f7c600";c.beginPath();c.arc(160+j,80,29,Math.PI,0);c.fill();c.fillRect(129+j,78,62,6)}
+VS.box=[120+j,50,80,160]}
+function analyse(c){var w=320,h=240,fr=c.getImageData(0,0,w,h),d=fr.data,i,x,y;
+var ls=0,gs=0,ns=0,sp=[];for(y=0;y<h;y+=4)for(x=0;x<w-4;x+=4){i=(y*w+x)*4;var q1=d[i]*0.3+d[i+1]*0.59+d[i+2]*0.11,q2=d[i+4]*0.3+d[i+5]*0.59+d[i+6]*0.11;ls+=q1;gs+=Math.abs(q1-q2);sp.push(q1);ns++}
+var L=ls/ns,G=gs/ns,bad=L<45?0:L>235?1:(VS.mode===1&&G<1.5)?2:-1,md=0;
+if(VS.mode===1&&VS.ps){for(i=0;i<sp.length;i++)md+=Math.abs(sp[i]-VS.ps[i]);md/=sp.length;VS.fz=md<0.02?(VS.fz||0)+1:0}VS.ps=sp;
+VS.warn=(VS.fz>=15)?3:bad;if(VS.warn>=0){LV.helmet=null;VS.box=null;VS.hr=null;VS.prev=null;return}
+if(VS.mode===1){var g=new Uint8Array(w*h),mnx=w,mxx=0,mny=h,mxy=0,n=0;
+for(i=0;i<w*h;i++)g[i]=(d[i*4]+d[i*4+1]+d[i*4+2])/3;
+if(VS.prev){for(y=0;y<h;y+=2)for(x=0;x<w;x+=2){if(Math.abs(g[y*w+x]-VS.prev[y*w+x])>28){n++;if(x<mnx)mnx=x;if(x>mxx)mxx=x;if(y<mny)mny=y;if(y>mxy)mxy=y}}
+if(n>40&&mxy-mny>40){VS.box=[mnx,mny,mxx-mnx,mxy-mny];VS.seen=12}else if(VS.seen>0)VS.seen--;else VS.box=null}
+VS.prev=g}
+var bx=VS.box;if(!bx){LV.helmet=null;return}
+var hx=Math.max(0,Math.round(bx[0]+bx[2]*0.2)),hw=Math.round(bx[2]*0.6),hy=Math.max(0,Math.round(bx[1]-bx[3]*0.05)),hh=Math.max(8,Math.round(bx[3]*0.28)),hit=0,tot=0;
+if(VS.mode===2){hy=Math.round(bx[1]);hh=60}
+for(y=hy;y<Math.min(h,hy+hh);y+=2)for(x=hx;x<Math.min(w,hx+hw);x+=2){var p=(y*w+x)*4,q=hsv(d[p],d[p+1],d[p+2]);tot++;
+if(q[1]>0.55&&q[2]>0.5&&((q[0]>=18&&q[0]<=62)||q[0]<12||q[0]>345||(q[0]>=200&&q[0]<=240)))hit++}
+var rr=tot>0?hit/tot:0;LV.helmet=rr>0.15?true:rr>0.05?null:false;VS.hr=[hx,hy,hw,hh];chkStep(rr)}
+function vLoop(){var cv=document.getElementById("cv");if(!cv||!VS.mode)return;var c=cv.getContext("2d"),vid=document.getElementById("vid");VS.tk++;
+if(VS.mode===2)drawDemo(c);else if(vid&&vid.videoWidth)c.drawImage(vid,0,0,320,240);
+if(VS.cover){c.fillStyle="rgba(0,0,0,.93)";c.fillRect(0,0,320,240)}
+analyse(c);
+if(VS.box){c.lineWidth=3;c.strokeStyle=LV.helmet?"#2fbf71":LV.helmet===null?"#f2c200":"#ff4d3d";c.strokeRect(VS.box[0],VS.box[1],VS.box[2],VS.box[3]);if(VS.hr){c.lineWidth=1.5;c.strokeStyle="#fff";c.strokeRect(VS.hr[0],VS.hr[1],VS.hr[2],VS.hr[3])}}
+var st=document.getElementById("vst");if(st)st.textContent=VS.warn>=0?t(U6.wn).replace("{r}",t(U6.qk[VS.warn])):VS.box?(LV.helmet===null?t(U6.un):t(UI2.lb[4])+": "+t(UI2.hs[LV.helmet?0:1])):t(UI2.np);chkTick()}
+function vStop(){VS.mode=0;VS.box=null;VS.prev=null;LV.helmet=null;if(VS.stream){VS.stream.getTracks().forEach(function(x){x.stop()});VS.stream=null}
+var cv=document.getElementById("cv");if(cv)cv.getContext("2d").clearRect(0,0,320,240);var st=document.getElementById("vst");if(st)st.textContent="";paintLV()}
+function demoStart(){vStop();VS.mode=2}
+function camStart(){vStop();var st=document.getElementById("vst");
+try{navigator.mediaDevices.getUserMedia({video:{width:320,height:240}}).then(function(s){VS.stream=s;var v=document.getElementById("vid");v.srcObject=s;v.play();VS.mode=1}).catch(function(){if(st)st.textContent=t(UI2.nc)})}
+catch(e){if(st)st.textContent=t(UI2.nc)}}
+setInterval(tickLV,1000);setInterval(vLoop,200);
+
+var U3={
+ct:["总控中心（多名工人，模拟）","Control center (several workers, simulated)","총괄 관제(다수 작업자, 시뮬레이션)"],
+cs:["一个画面汇总多名工人的手表数据与安全帽状态；上传的只有假名ID和告警字段，不含视频","One view of several workers’ watch data and helmet status; only a pseudonymous ID and alert fields are uplinked, no video","여러 작업자의 워치 데이터와 안전모 상태를 한 화면에 표시합니다. 업링크는 가명 ID와 경보 필드뿐이며 영상은 없습니다"],
+col:[["工人","Worker","작업자"],["区域","Zone","구역"],["心率","HR","심박"],["血氧","SpO2","SpO2"],["安全帽","Helmet","안전모"],["状态","Status","상태"]],
+ij:["注入风险","Inject risk","위험 주입"],rz:["复位","Reset","초기화"],off:["离线","Offline","오프라인"],
+up:["每名工人每秒约 {b} 字节（仅负载，不含网络头）；1 Mbps 视频流约 125000 字节/秒，约小 {r} 倍","About {b} bytes per worker per second (payload only, no network headers); a 1 Mbps video stream is about 125,000 bytes/s, roughly {r}× larger","작업자당 초당 약 {b}바이트(페이로드만, 네트워크 헤더 제외). 1 Mbps 영상은 약 125,000바이트/초로 약 {r}배 큽니다"],
+dt:["10秒应急响应与人工否决","10-second emergency response with human veto","10초 응급 대응과 사람의 거부권"],
+ds:["模拟从确认事故到匹配医院的 5 个环节；管理员可在 10 秒内否决。不会拨打任何真实电话","Simulates five steps from a confirmed incident to hospital matching; a manager can veto within 10 s. No real call is ever made","사고 확정부터 병원 매칭까지 5단계를 시뮬레이션하며 관리자는 10초 안에 거부할 수 있습니다. 실제 전화는 걸리지 않습니다"],
+run:["开始模拟","Start simulation","시뮬레이션 시작"],vt:["人工否决","Human veto","사람 거부"],
+vd:["已由人工否决：流程中止并写入日志","Vetoed by a human: the flow stopped and was logged","사람이 거부함: 절차 중단 및 기록"],
+st:[["本地声光告警","Local audio-visual alarm","현장 음성·경광 경보"],["分级通知：本人、现场主管、管理层、紧急联系人","Tiered notice: worker, site supervisor, management, emergency contact","단계별 통지: 본인·현장 관리자·경영진·비상연락처"],["证据写入哈希链日志","Evidence written to hash-chain log","증거를 해시체인 로그에 기록"],["向急救调度报警（模拟）","Report to emergency dispatch (simulated)","응급 신고 전송(시뮬레이션)"],["匹配最优医院","Best-hospital matching","최적 병원 매칭"]],
+hh:["医院匹配：得分 = 距离 − 0.2×空床 − 2×专科可用，越低越好（示例数据与权重）","Hospital match: score = distance − 0.2×free beds − 2×specialist available, lower is better (sample data and weights)","병원 매칭: 점수 = 거리 − 0.2×가용병상 − 2×전문의 가능, 낮을수록 우수(예시 데이터·가중치)"],
+hn:["医院","Hospital","병원"],hb:["最优","Best","최적"],
+ch:["哈希链（SHA-256，每条记录包含上一条的哈希，改动任何一条都会使后续全部失效）","Hash chain (SHA-256; each record includes the previous hash, so editing one breaks all later ones)","해시체인(SHA-256, 각 기록에 이전 해시 포함, 하나를 바꾸면 이후 모두 깨짐)"],
+rt:["按年龄分层的 3 分钟恢复运动","Age-banded 3-minute recovery exercises","연령대별 3분 회복 운동"],
+rsub:["点击卡片开始倒计时","Tap a card to start the countdown","카드를 누르면 카운트다운이 시작됩니다"],
+rx:[["20–30岁","Ages 20–30","20–30대"],["腰核心稳定与腘绳肌拉伸","Lower-back core and hamstring stretch","허리 코어·햄스트링 스트레칭"],["扶墙，一腿后伸，保持15秒拉伸小腿和大腿后侧，左右各3组","Hands on a wall, one leg back, hold 15 s to stretch calf and hamstring; 3 sets each side","벽을 짚고 한쪽 다리를 뒤로 뻗어 15초 유지, 좌우 3세트"],3,
+["40–50岁","Ages 40–50","40–50대"],["肩袖与肩胛放松","Shoulder and scapular release","어깨·견갑골 이완"],["双手搭肩，肘部画大圈，前后各10次","Hands on shoulders, draw big circles with the elbows, 10 each way","양손을 어깨에 얹고 팔꿈치로 큰 원, 앞뒤 각 10회"],4,
+["60岁以上","Ages 60+","60대 이상"],["脚踝灵活与下肢平衡","Ankle mobility and leg balance","발목 유연성·하지 균형"],["扶稳栏杆，缓慢抬起脚跟并保持3秒，重复10次","Holding a rail, rise onto the toes, hold 3 s, repeat 10 times","난간을 잡고 발뒤꿈치를 들어 3초 유지, 10회 반복"],3],
+rn:["一般健康提示，非医疗建议；出现疼痛请停止并咨询专业人员","General wellness tips, not medical advice; stop if you feel pain and consult a professional","일반 건강 안내이며 의료 조언이 아닙니다. 통증이 있으면 중단하고 전문가와 상담하세요"]};
+var WK=[],HOSP=[["A",3.8,15,1],["B",5.2,4,1],["C",2.1,0,0]],DS={run:false,t:0,done:0,veto:false,chain:[],last:"genesis",p:Promise.resolve()},RC={i:-1,left:0};
+var U4={
+nv:[["主控台（总部）","Main console (HQ)","주 관제(본사)"],["手表端（副页面）","Watch view (secondary)","워치 화면(보조)"]],
+zn:[["装配区","Assembly","조립"],["焊接区","Welding","용접"],["仓储物流区","Warehouse","물류"],["检测区","Inspection","검사"]],
+rel:[["家属","Family","가족"],["配偶","Spouse","배우자"]],
+all:["全部分区","All zones","전체 구역"],
+ct:["考勤、分区与手表监测","Attendance, zones and watch monitoring","출근·구역·워치 모니터링"],
+cs:["同一套数据：手表实时监测、按手表编号打卡、按功能分区查看（工人用编号代替姓名）","One dataset: live watch monitoring, clock-in by watch ID, zone views (workers shown by ID, not name)","하나의 데이터: 실시간 워치 모니터링, 워치 ID 출근, 구역별 보기(이름 대신 ID)"],
+sm:[["已打卡","Clocked in","출근"],["平均出勤率","Avg attendance","평균 출근율"],["活动警报","Active alerts","활성 경보"]],
+col:[["工人","Worker","작업자"],["手表编号","Watch ID","워치 ID"],["分区","Zone","구역"],["今日打卡","Clock-in","출근 시각"],["出勤率","Attendance","출근율"],["心率","HR","심박"],["血氧","SpO2","SpO2"],["状态","Status","상태"],["操作","Action","작업"]],
+ni:["未打卡","Not yet","미출근"],sf:["模拟跌倒","Simulate fall","낙상 시뮬레이션"],rv:["已处理","Resolved","처리 완료"],
+fs:[["跌倒确认中 {n} 秒","Fall check {n} s","낙상 확인 {n}초"],["已发出SOS","SOS sent","SOS 전송"]],
+at:["警报与呼叫日志","Alert and call log","경보·호출 로그"],
+ak:[["检测到跌倒，等待工人确认","Fall detected, waiting for worker confirmation","낙상 감지, 작업자 확인 대기"],["工人未响应：SOS 已发送总部","No response: SOS sent to HQ","무응답: SOS 본사 전송"],["正在呼叫紧急联系人（{c}，模拟）","Calling emergency contact ({c}, simulated)","비상연락처 호출 중({c}, 시뮬레이션)"],["总部已处理","Handled by HQ","본사 처리 완료"],["工人确认安全，已取消","Worker confirmed OK, cancelled","작업자 안전 확인, 취소"],["工人手动按下 SOS","Worker pressed SOS manually","작업자가 SOS 수동 입력"]],
+cn:["出勤率 = 近 20 个工作日出勤天数 ÷ 20（合成数据，今日打卡后才计入）。网页版只记录呼叫，App 版需接入电话/短信网关或系统拨号，不会真实拨打。","Attendance = days present in the last 20 workdays ÷ 20 (synthetic; today counts once clocked in). The web demo only logs the call; an app would use a telephony/SMS gateway or the system dialer. No real call is made.","출근율 = 최근 20 근무일 중 출근 일수 ÷ 20(합성 데이터, 오늘은 출근 후 반영). 웹 데모는 호출을 기록만 하며, 앱은 전화/문자 게이트웨이나 시스템 다이얼러가 필요합니다. 실제 호출은 없습니다."],
+wt:["手表端（副页面）","Watch view (secondary page)","워치 화면(보조 페이지)"],
+ws:["模拟工人手腕上的统一电子手表：选择手表编号后可打卡、求救或模拟跌倒，主控台会同步显示","Simulates the standard watch on a worker’s wrist: pick a watch ID, then clock in, call for help or simulate a fall; the main console updates at once","작업자 손목의 표준 워치를 시뮬레이션합니다. 워치 ID를 고른 뒤 출근·SOS·낙상을 실행하면 주 관제에 즉시 반영됩니다"],
+sl:["手表编号","Watch ID","워치 ID"],
+ck:["打卡上班","Clock in","출근 체크"],cd:["已打卡 {t}","Clocked in {t}","출근 {t}"],
+ss:["求救 SOS","SOS","SOS"],ok:["我没事，取消","I’m OK, cancel","괜찮아요, 취소"],
+w0:["检测到跌倒！","Fall detected!","낙상 감지!"],w1:["{n} 秒后自动求救","SOS in {n} s","{n}초 후 자동 SOS"],
+w2:["SOS 已发送总部，正在呼叫紧急联系人","SOS sent to HQ; calling emergency contact","SOS 본사 전송, 비상연락처 호출 중"],
+wo:["手表未佩戴 / 离线","Watch not worn / offline","워치 미착용 / 오프라인"],
+ap:["为 App 化预留","Ready for an app","앱 전환 준비"],
+ai:["数据已按“手表 → 总部”的事件模型整理，做 App 时可直接沿用","Data follows a watch-to-HQ event model that an app can reuse","데이터는 워치→본사 이벤트 모델이라 앱에서 그대로 재사용할 수 있습니다"],
+al:[["手表端：用 BLE 读取心率和加速度，本地判定跌倒，离线时缓存事件","Watch: read HR and acceleration over BLE, decide falls locally, cache events offline","워치: BLE로 심박·가속도 수집, 로컬 낙상 판정, 오프라인 이벤트 캐시"],["手机或网关：把事件推送到总部（MQTT/WebSocket），断网后重发","Phone or gateway: push events to HQ (MQTT/WebSocket), retry after outages","폰/게이트웨이: 이벤트를 본사로 푸시(MQTT/WebSocket), 단절 후 재전송"],["求救：服务器触发电话/短信网关并通知总部；紧急联系人须事先取得工人同意","SOS: the server triggers a phone/SMS gateway and notifies HQ; the emergency contact must be agreed in advance","SOS: 서버가 전화/문자 게이트웨이를 호출하고 본사에 알림. 비상연락처는 사전 동의 필요"],["考勤和生理数据属于个人信息：最小化采集、分级授权、设定保存期限（按部署地适用 PIPA、个保法或 GDPR）","Attendance and vitals are personal data: minimise collection, restrict access, set retention (PIPA, PIPL or GDPR by deployment site)","출근·생체 데이터는 개인정보: 수집 최소화, 접근 통제, 보관 기간 설정(배포 지역별 PIPA·PIPL·GDPR)"],["界面：同一套数据可做成 PWA 或 Flutter/React Native App；主控台用平板或电脑，手表端对应手表或手机","UI: the same data can become a PWA or Flutter/React Native app; HQ on tablet or PC, watch view on a watch or phone","UI: 같은 데이터로 PWA 또는 Flutter/React Native 앱 제작. 본사는 태블릿/PC, 워치 화면은 워치/폰"]]};
+var VIEW="m",ZV=-1,WSEL=0,ALERTS=[];
+function hm(){var d=new Date();return("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)}
+function wkInit(){WK=Array.apply(null,Array(20)).map(function(_,i){var a=[],d;for(d=0;d<19;d++)a.push((d*3+i)%19>=(i%3));
+var b=76+(i%5)*3,on=i<14&&i!==9,m=470+i*2,w={id:"W-"+("0"+(i+1)).slice(-2),sw:"SW-"+(1001+i),z:i%4,r:i%2,hr:b,sp:98,h:true,off:i===9,base:b,b0:b,bsp:98,bh:true,in:on,inT:on?("0"+Math.floor(m/60)).slice(-2)+":"+("0"+m%60).slice(-2):"",fl:0,fc:0,att:a,cmd:null};
+w.tz=on?w.z:4;pickT(w);w.x=w.tx;w.y=w.ty;pickT(w);return w})}
+wkInit();
+function wkLvl(w){return w.fl===2?2:w.fl===1?1:(w.hr>130||w.sp<92)?2:(w.hr>110||w.sp<94||!w.h)?1:0}
+function rate(w){return Math.round((w.att.filter(Boolean).length+(w.in?1:0))/20*100)}
+function addA(i,k,z){ALERTS.unshift({t:hm(),i:i,k:k,z:z});if(ALERTS.length>40)ALERTS.pop()}
+function fall(i){var w=WK[i];if(w.off||w.fl)return;w.fl=1;w.fc=10;w.base=112;addA(i,0)}
+function sosNow(i,k){var w=WK[i];if(w.off||w.fl===2)return;w.fl=2;w.fc=0;addA(i,k);addA(i,2);siren()}
+function clr(i,k){var w=WK[i];w.fl=0;w.fc=0;w.base=w.b0;addA(i,k)}
+function clock(i){var w=WK[i];if(w.off||w.in)return;w.in=true;w.inT=hm();w.tz=w.z;pickT(w)}
+function rp(){paintCtr();paintW();paintMap();paintDet()}
+function ctrHTML(){var U=U3,V=U4;return '<section id="ctr"><h2>'+t(V.ct)+'</h2><p class="sub">'+t(V.cs)+'</p><div class="seg"><button class="run sc" data-z="-1">'+t(V.all)+'</button>'+V.zn.map(function(x,i){return '<button class="run sc" data-z="'+i+'">'+t(x)+'</button>'}).join("")+'</div><div class="g tiles" id="csum"></div><div><button class="run" id="cj">'+t(U.ij)+'</button><button class="run" id="cz">'+t(U.rz)+'</button></div><div class="sc"><table><tr>'+V.col.map(function(x){return '<th>'+t(x)+'</th>'}).join("")+'</tr><tbody id="ctb"></tbody></table></div><p id="cup"></p><p>'+t(V.cn)+'</p><h3>'+t(V.at)+'</h3><ul class="l" id="cal"></ul></section>'}
+function paintCtr(){var b=document.getElementById("ctb");if(!b)return;var V=U4,by=0,L=WK.filter(function(w){return ZV<0||w.z===ZV}),n=WK.filter(function(w){return w.in}).length,av=Math.round(WK.reduce(function(s,w){return s+rate(w)},0)/WK.length),ac=WK.filter(function(w){return w.fl>0}).length;
+var bs=document.querySelectorAll("button[data-z]");for(var k=0;k<bs.length;k++)bs[k].className="run sc"+(+bs[k].getAttribute("data-z")===ZV?" sel":"");
+document.getElementById("csum").innerHTML=[n+" / "+WK.length,av+" %",ac].map(function(x,i){return '<div class="st"><span>'+t(V.sm[i])+'</span><b>'+x+'</b></div>'}).join("");
+b.innerHTML=L.map(function(w){var i=WK.indexOf(w),l=wkLvl(w),st=w.fl===1?t(V.fs[0]).replace("{n}",w.fc):w.fl===2?t(V.fs[1]):"",c='<td>'+w.id+'</td><td>'+w.sw+'</td><td>'+t(V.zn[w.z])+'</td>';
+if(w.off)return '<tr>'+c+'<td colspan="5">'+t(U3.off)+'</td><td>-</td></tr>';
+by=JSON.stringify({id:"P"+w.id.slice(2)+"x",z:w.z,hr:Math.round(w.hr),sp:Math.round(w.sp),h:w.h?1:0,s:l,t:Math.floor(Date.now()/1000)}).length;
+return '<tr>'+c+'<td>'+(w.in?w.inT:t(V.ni))+'</td><td>'+rate(w)+'%</td><td>'+Math.round(w.hr)+'</td><td>'+Math.round(w.sp)+'%</td><td><span class="pill l'+l+'">'+t(UI2.lv[l])+'</span> '+st+'</td><td>'+(w.fl?'<button class="run" data-res="'+i+'">'+t(V.rv)+'</button>':'<button class="run" data-f="'+i+'">'+t(V.sf)+'</button>')+'</td></tr>'}).join("");
+document.getElementById("cup").textContent=t(U3.up).replace("{b}",by).replace("{r}",Math.round(125000/Math.max(1,by)));
+document.getElementById("cal").innerHTML=ALERTS.slice(0,8).map(function(a){var w=WK[a.i];return '<li>'+a.t+' · '+w.id+' ('+w.sw+') · '+t(V.ak[a.k]).replace("{c}",t(V.rel[w.r])).replace("{z}",a.z!=null?t(V.zn5[a.z]):"")+'</li>'}).join("")}
+function tickCtr(){WK.forEach(function(w,i){if(w.off)return;w.hr+=(w.base-w.hr)*0.2+(Math.random()-0.5)*3;w.sp+=(w.bsp-w.sp)*0.2+(Math.random()-0.5)*0.4;w.h=w.bh;if(w.fl===1){w.fc--;if(w.fc<=0)sosNow(i,1)}if(w.cmd&&!w.cmd.ack&&++w.cmd.age>=4&&!(VIEW==="w"&&i===WSEL))ackCmd(i)});rp()}
+function wvHTML(){var V=U4;return '<section id="wv"><h2>'+t(V.wt)+'</h2><p class="sub">'+t(V.ws)+'</p><p><label>'+t(V.sl)+' <select id="wsel">'+WK.map(function(w,i){return '<option value="'+i+'"'+(i===WSEL?' selected':'')+'>'+w.sw+' · '+w.id+'</option>'}).join("")+'</select></label></p><div class="wf" id="wd"></div></section>'}
+function paintW(){var d=document.getElementById("wd");if(!d)return;var V=U4,w=WK[WSEL],H='<div class="wt">'+hm()+'</div><div>'+w.sw+' · '+w.id+' · '+t(V.zn[w.z])+'</div>';
+if(w.off){d.innerHTML=H+'<p>'+t(V.wo)+'</p>';return}
+H+='<p>♥ '+Math.round(w.hr)+' bpm · SpO2 '+Math.round(w.sp)+'%</p>';
+if(w.fl===1)H+='<div class="wa"><b>'+t(V.w0)+'</b><br>'+t(V.w1).replace("{n}",w.fc)+'<br><button class="run" data-ok="'+WSEL+'">'+t(V.ok)+'</button></div>';
+else if(w.fl===2)H+='<div class="wa">'+t(V.w2)+'</div>';
+if(w.cmd&&!w.cmd.ack)H+='<div class="wa" style="background:#8a5a00"><b>'+t(U5.cm)+'</b><br>'+cmdText(w.cmd)+'<br><button class="run" data-ack="'+WSEL+'">'+t(U5.ak2)+'</button></div>';
+H+='<button class="run" data-clk="'+WSEL+'"'+(w.in?' disabled':'')+'>'+(w.in?t(V.cd).replace("{t}",w.inT):t(V.ck))+'</button><button class="run sosb" data-sos="'+WSEL+'">'+t(V.ss)+'</button><button class="run" data-f="'+WSEL+'">'+t(V.sf)+'</button>';
+if(d.getAttribute("data-h")!==H){d.setAttribute("data-h",H);d.innerHTML=H}}
+function appHTML(){var V=U4;return '<section id="app2"><h2>'+t(V.ap)+'</h2><p class="sub">'+t(V.ai)+'</p><ul class="l">'+V.al.map(function(x){return '<li>'+t(x)+'</li>'}).join("")+'</ul><pre class="alarm">{"event":"fall_sos","watch":"SW-1003","worker":"W-03","zone":"WELD","ts":"2026-11-04T09:15:02+09:00","vitals":{"hr":118,"spo2":96},"fall":{"confirmed":false,"countdown_s":10},"contact":{"relation":"family","called":true}}</pre></section>'}
+(function(){var A=document.getElementById("app");A.onclick=function(e){var gw=e.target.closest("[data-w]");if(gw){SEL=+gw.getAttribute("data-w");rp();return}var b=e.target.closest("button");if(!b)return;var g=function(k){var v=b.getAttribute(k);return v===null?null:+v},v;
+if((v=g("data-z"))!==null){ZV=v}else if((v=g("data-f"))!==null){fall(v)}else if((v=g("data-res"))!==null){clr(v,3)}else if((v=g("data-ok"))!==null){clr(v,4)}else if((v=g("data-clk"))!==null){clock(v)}else if((v=g("data-sos"))!==null){sosNow(v,5)}else if((v=g("data-ack"))!==null){ackCmd(v)}else if((v=g("data-go"))!==null){sendCmd(SEL,"go",v)}else if(b.getAttribute("data-cmd")){sendCmd(SEL,"h")}else if(b.getAttribute("data-ball")){bcast(b.getAttribute("data-ball"))}else if(b.getAttribute("data-sir")){if(b.getAttribute("data-sir")==="t")siren(true);else{SIR.on=!SIR.on;b.textContent=t(U6[SIR.on?"so":"sf"])}}else if(b.getAttribute("data-vx")){valAct(b.getAttribute("data-vx"));return}else if(b.getAttribute("data-cx")){camAct(b.getAttribute("data-cx"));return}else if(b.getAttribute("data-px")){posAct(b.getAttribute("data-px"));return}else return;rp()};
+A.onchange=function(e){if(e.target.id==="wsel"){WSEL=+e.target.value;rp()}};
+document.getElementById("nav").onclick=function(e){var b=e.target.closest("button[data-v]");if(b){VIEW=b.getAttribute("data-v");render();window.scrollTo(0,0)}}})();
+
+var U5={
+mt:["厂区实时地图（模拟定位）","Live floor map (simulated positioning)","공장 실시간 지도(위치 시뮬레이션)"],
+ms:["20 名工人按编号排列，位置来自手表（演示用模拟 BLE/UWB 信标定位）；点击地图上的工人查看状态并下发指令","20 workers in ID order; positions come from the watch (simulated BLE/UWB beacon positioning); click a worker to see status and send orders","작업자 20명을 ID 순으로 표시하며 위치는 워치에서 옵니다(BLE/UWB 비콘 시뮬레이션). 작업자를 눌러 상태 확인 및 지시를 보냅니다"],
+gate:["入口 / 集合点","Gate / assembly point","출입구·집결지"],
+lg:["绿 正常，黄 关注，红 危险，灰 离线；红色虚线圈 = 未戴安全帽；黄点 = 指令待工人确认","Green normal, amber watch, red danger, grey offline; dashed red ring = no helmet; yellow dot = order awaiting acknowledgement","녹색 정상, 황색 주의, 적색 위험, 회색 오프라인. 붉은 점선 = 안전모 미착용, 노란 점 = 지시 확인 대기"],
+nt:["定位为模拟。真实部署需要 BLE/UWB 信标等室内定位，精度和成本要现场实测。指令必须由工人在手表上确认才算送达。","Positioning is simulated. A real site needs indoor positioning such as BLE/UWB beacons, and accuracy and cost must be measured on site. An order counts as delivered only when the worker acknowledges it on the watch.","위치는 시뮬레이션입니다. 실제 현장은 BLE/UWB 비콘 등 실내 측위가 필요하며 정확도와 비용은 현장 측정이 필요합니다. 지시는 작업자가 워치에서 확인해야 전달된 것으로 봅니다."],
+sel:["点击地图上的工人","Click a worker on the map","지도에서 작업자를 누르세요"],
+ps:["当前所在","Now in","현재 구역"],ar:["指定岗位","Assigned","배정 구역"],
+go:["前往 {z}","Go to {z}","{z}로 이동"],hm:["提醒戴安全帽","Remind: wear helmet","안전모 착용 알림"],
+ba:[["全员提醒戴安全帽","Remind everyone: helmet","전원 안전모 알림"],["全员前往集合点","Everyone to assembly point","전원 집결지로 이동"]],
+od:["指令","Order","지시"],pd:["待确认","awaiting acknowledgement","확인 대기"],ad:["已确认","acknowledged","확인됨"],nn:["未打卡或离线，无法下发指令","Not clocked in or offline: orders unavailable","미출근 또는 오프라인: 지시 불가"],
+cm:["总部指令","HQ order","본사 지시"],ak2:["收到","Acknowledge","확인"]};
+U4.zn5=U4.zn.concat([U5.gate]);
+U4.ak.push(["指令已下发：前往 {z}","Order sent: go to {z}","지시 전송: {z}로 이동"],["指令已下发：请佩戴安全帽","Order sent: wear your helmet","지시 전송: 안전모 착용"],["工人已确认指令","Worker acknowledged the order","작업자가 지시를 확인"]);
+var SEL=0;
+function zr(z){return z<4?{x:20+(z%2)*310,y:20+Math.floor(z/2)*150,w:290,h:130}:{x:20,y:322,w:600,h:30}}
+function pickT(w){var r=zr(w.tz);w.tx=r.x+14+Math.random()*(r.w-28);w.ty=r.y+14+Math.random()*(r.h-28)}
+function zAt(w){for(var z=0;z<5;z++){var r=zr(z);if(w.x>=r.x&&w.x<=r.x+r.w&&w.y>=r.y&&w.y<=r.y+r.h)return z}return 4}
+function cmdText(c){return c.k==="go"?t(U5.go).replace("{z}",t(U4.zn5[c.z])):t(U5.hm)}
+function sendCmd(i,k,z,q){var w=WK[i];if(!w||w.off||!w.in)return;w.cmd={k:k,z:z,t:hm(),ack:false,age:0,q:q};if(!q)addA(i,k==="go"?6:7,z)}
+function ackCmd(i){var w=WK[i];if(!w||!w.cmd||w.cmd.ack)return;w.cmd.ack=true;if(w.cmd.k==="go"){w.tz=w.cmd.z;pickT(w)}else w.bh=true;if(!w.cmd.q)addA(i,8)}
+function bcast(k){WK.forEach(function(w,i){sendCmd(i,k==="h"?"h":"go",4,true)})}
+function mapHTML(){return '<section id="map"><h2>'+t(U5.mt)+'</h2><p class="sub">'+t(U5.ms)+'</p><div class="mapw"><svg id="mp" viewBox="0 0 640 360" role="img" aria-label="floor map"></svg><div class="c" id="mdt"></div></div><p>'+t(U5.lg)+'</p><div class="warn">'+t(U5.nt)+'</div></section>'}
+function paintMap(){var s=document.getElementById("mp");if(!s)return;var C=["#16794a","#c98a00","#c2332b"],h="",z;
+for(z=0;z<5;z++){var r=zr(z);h+='<rect x="'+r.x+'" y="'+r.y+'" width="'+r.w+'" height="'+r.h+'" rx="8" fill="var(--a2)" stroke="#8a94a3" stroke-opacity=".5"/><text x="'+(r.x+8)+'" y="'+(r.y+15)+'" font-size="12" fill="var(--mu,#667)">'+t(U4.zn5[z])+'</text>'}
+WK.forEach(function(w,i){var col=w.off?"#8a94a3":C[wkLvl(w)],x=w.x.toFixed(1),y=w.y.toFixed(1);h+='<g data-w="'+i+'" style="cursor:pointer"><circle cx="'+x+'" cy="'+y+'" r="10" fill="'+col+'" stroke="'+(i===SEL?"var(--tx)":"#fff")+'" stroke-width="'+(i===SEL?3:1.5)+'"/>'+(!w.h&&!w.off?'<circle cx="'+x+'" cy="'+y+'" r="14" fill="none" stroke="#c2332b" stroke-dasharray="3 3"/>':'')+(w.cmd&&!w.cmd.ack?'<circle cx="'+(w.x+9).toFixed(1)+'" cy="'+(w.y-9).toFixed(1)+'" r="4" fill="#f2c200"/>':'')+'<text x="'+x+'" y="'+(w.y+3).toFixed(1)+'" text-anchor="middle" font-size="9" fill="#fff" font-weight="700">'+(i+1)+'</text></g>'});
+s.innerHTML=h}
+function paintDet(){var d=document.getElementById("mdt");if(!d)return;var w=WK[SEL],H='<b>'+w.id+' · '+w.sw+'</b><br>'+t(U5.ar)+': '+t(U4.zn[w.z])+'<br>'+t(U5.ps)+': '+t(U4.zn5[zAt(w)])+' ('+Math.round(w.x)+', '+Math.round(w.y)+')<br>';
+if(w.off||!w.in)H+=t(U5.nn)+'<br>';else{H+='♥ '+Math.round(w.hr)+' · SpO2 '+Math.round(w.sp)+'% · <span class="pill l'+wkLvl(w)+'">'+t(UI2.lv[wkLvl(w)])+'</span><br>';
+if(w.cmd)H+=t(U5.od)+': '+cmdText(w.cmd)+' · '+t(w.cmd.ack?U5.ad:U5.pd)+'<br>';
+for(var z=0;z<5;z++)H+='<button class="run" data-go="'+z+'">'+t(U5.go).replace("{z}",t(U4.zn5[z]))+'</button>';H+='<button class="run" data-cmd="h">'+t(U5.hm)+'</button><br>'}
+H+='<hr><button class="run" data-ball="h">'+t(U5.ba[0])+'</button><button class="run" data-ball="g">'+t(U5.ba[1])+'</button>';
+if(d.getAttribute("data-h")!==H){d.setAttribute("data-h",H);d.innerHTML=H}}
+function moveTick(){WK.forEach(function(w){if(w.off||w.fl>0)return;var dx=w.tx-w.x,dy=w.ty-w.y,d=Math.sqrt(dx*dx+dy*dy);if(d>3){w.x+=dx/d*3;w.y+=dy/d*3}else if(Math.random()<0.03)pickT(w)});paintMap()}
+setInterval(moveTick,100);
+
+
+var U6={
+st:["警报声测试","Siren test","경보음 시험"],so:["警报声：开","Siren: on","경보음: 켬"],sf:["警报声：关","Siren: off","경보음: 끔"],
+pre:["作业前检查","Pre-shift check","작업 전 점검"],cv:["模拟遮挡镜头","Simulate blocked lens","렌즈 가림 시뮬레이션"],
+pm:["请面向镜头站稳约 4 秒…","Face the camera and hold still for about 4 seconds…","카메라를 보고 약 4초간 가만히 서 있으세요…"],
+nc:["请先开启摄像头或演示场景","Start the camera or the demo scene first","먼저 카메라 또는 데모 장면을 시작하세요"],
+vp:["✓ 通过：已佩戴安全帽","✓ Pass: helmet worn","✓ 통과: 안전모 착용"],vu:["⚠ 请重新确认：安全帽不清楚","⚠ Please recheck: helmet unclear","⚠ 재확인: 안전모가 불분명합니다"],vm:["✗ 未通过：未检测到安全帽","✗ Not passed: no helmet detected","✗ 미통과: 안전모 미감지"],vn:["未看到人，请重试","No one in view, please try again","사람이 보이지 않습니다. 다시 시도하세요"],
+un:["安全帽：不确定（请再确认）","Helmet: uncertain (please recheck)","안전모: 불확실(재확인 필요)"],
+qk:[["画面太暗","image too dark","화면이 너무 어두움"],["画面过曝","image overexposed","화면 과노출"],["镜头被遮挡或模糊","lens blocked or blurred","렌즈 가림 또는 흐림"],["画面已停住","video frozen","영상 정지"]],
+wn:["镜头状态异常：{r}。此时“没检测到”不可信，已暂停判定","Camera problem: {r}. “Nothing detected” cannot be trusted now, so judging is paused","카메라 이상: {r}. 지금은 ‘미검출’을 믿을 수 없어 판정을 중지했습니다"],
+lt:["局限与待验证","Limits and what is still unverified","한계와 미검증 사항"],
+li:[["所有生理数据、位置和工人都是合成演示，没有用真实工人验证","All vitals, positions and workers are synthetic; nothing was validated with real workers","모든 생체 데이터·위치·작업자는 합성이며 실제 작업자로 검증하지 않았습니다"],["安全帽识别是颜色启发式，不是训练过的检测模型：颜色相近的物体可能误判，白色或深色安全帽可能漏判","Helmet detection is a colour heuristic, not a trained model: look-alike colours can fool it and white or dark helmets may be missed","안전모 인식은 학습된 모델이 아닌 색상 휴리스틱입니다. 비슷한 색은 오인될 수 있고 흰색·어두운 안전모는 놓칠 수 있습니다"],["融合风险的阈值和权重是演示用的假设，没有做临床或现场校准","Risk thresholds and weights are demo assumptions, not calibrated clinically or on site","위험 임계값·가중치는 데모용 가정이며 임상·현장 보정을 하지 않았습니다"],["跌倒在演示中由按钮触发，尚未用真实跌倒数据测试","Falls are triggered by a button in this demo; no real fall data has been tested","낙상은 데모에서 버튼으로 발생시키며 실제 낙상 데이터로 시험하지 않았습니다"],["紧急联系人呼叫和指令送达都是模拟；这不是法定警报设备，也不能替代现场安全管理","Emergency calls and order delivery are simulated; this is not a statutory alarm system and does not replace on-site safety management","비상 호출과 지시 전달은 시뮬레이션이며 법정 경보 설비나 현장 안전관리를 대체하지 않습니다"],["下一步验证：真实工人佩戴手表的试点、标注数据集上的指标、现场摄像头与定位精度实测","Next validation: a pilot with real workers wearing watches, metrics on a labelled dataset, on-site camera and positioning accuracy tests","다음 검증: 실제 작업자 워치 시범 운영, 라벨 데이터셋 지표, 현장 카메라·측위 정확도 측정"]]};
+var SIR={on:true,ctx:null};
+function siren(f){if(!SIR.on&&!f)return;try{var C=SIR.ctx||(SIR.ctx=new (window.AudioContext||window.webkitAudioContext)()),o=C.createOscillator(),g=C.createGain(),t0=C.currentTime;o.type="square";g.gain.value=0.05;o.connect(g);g.connect(C.destination);for(var k=0;k<6;k++)o.frequency.setValueAtTime(k%2?600:900,t0+k*0.3);o.start(t0);o.stop(t0+1.8)}catch(e){}}
+function sfx(i){var v=LV.v;return i===0?" · "+Math.round(v.hr)+" bpm":i===1?" · "+Math.round(v.sbp)+"/"+Math.round(v.dbp):i===2?" · "+v.tp.toFixed(1)+" °C":i===3?" · "+Math.round(v.sp)+" %":""}
+function speak(x){try{var u=new SpeechSynthesisUtterance(x.replace(/^[^\s]+\s/,""));u.lang=["zh-CN","en-US","ko-KR"][cur];speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+function chkStart(){var e=document.getElementById("vck");if(!VS.mode){e.textContent=t(U6.nc);return}VS.chk={on:true,tk:0,n:0,sum:0};e.textContent=t(U6.pm)}
+function chkStep(r){var c=VS.chk;if(c&&c.on){c.n++;c.sum+=r}}
+function chkTick(){var c=VS.chk;if(!c||!c.on)return;c.tk++;if(c.tk<20)return;c.on=false;var a=c.n?c.sum/c.n:0,m=c.n<6?U6.vn:a>0.15?U6.vp:a>0.05?U6.vu:U6.vm,x=t(m),e=document.getElementById("vck");if(e)e.textContent=x;speak(x)}
+function limHTML(){return '<section id="lim"><h2>'+t(U6.lt)+'</h2><ul class="l">'+U6.li.map(function(x){return '<li>'+t(x)+'</li>'}).join("")+'</ul></section>'}
+
+
+var U7={
+vt:["验证结果计算器","Validation results calculator","검증 결과 계산기"],
+vs:["把标注好的测试组结果填进表格，自动算出漏检率、误报率、不确定率和 95% Wilson 置信区间。数字只来自你填入的数据。","Enter the results on your labelled test set to get miss rate, false-alarm rate and unsure rate with 95% Wilson confidence intervals. Numbers come only from what you enter.","라벨링한 테스트 결과를 입력하면 미검출률·오경보율·불확실률과 95% Wilson 신뢰구간을 계산합니다. 숫자는 입력값에서만 나옵니다."],
+pn:["测试组人数（按人划分，调参组不算）","Persons in the test set (split by person, tuning set excluded)","테스트 인원(사람 단위 분할, 튜닝 세트 제외)"],
+gp:["分组","Group","그룹"],
+cl:[["没戴→判没戴","No helmet → no helmet","미착용→미착용"],["没戴→不确定","No helmet → unsure","미착용→불확실"],["没戴→判通过（漏检）","No helmet → pass (miss)","미착용→통과(미검출)"],["戴了→判通过","Helmet → pass","착용→통과"],["戴了→不确定","Helmet → unsure","착용→불확실"],["戴了→判没戴（误报）","Helmet → no helmet (false alarm)","착용→미착용(오경보)"]],
+dg:[["明亮","Bright","밝음"],["昏暗","Dim","어두움"],["逆光","Backlit","역광"]],tt:["总计","Total","합계"],
+ex:["填入示例数据（仅演示）","Fill example data (demo only)","예시 데이터 입력(데모 전용)"],cr:["清空","Clear","초기화"],
+eb:["当前是示例数据，不是实测结果，请不要引用，也不要当作自己的成绩展示","This is example data, not measured results; do not cite it or present it as your own","예시 데이터이며 실측 결과가 아닙니다. 인용하거나 본인 성과로 제시하지 마세요"],
+rc:[["没戴张数","No-helmet images","미착용 수"],["漏检率","Miss rate","미검출률"],["戴了张数","Helmet images","착용 수"],["误报率","False-alarm rate","오경보율"],["不确定率","Unsure rate","불확실률"]],
+mt:["混淆矩阵（总计）","Confusion matrix (total)","혼동 행렬(합계)"],
+ra:[["实际没戴","Actually no helmet","실제 미착용"],["实际戴了","Actually helmet","실제 착용"]],
+cj:[["判没戴","Judged no helmet","미착용 판정"],["不确定","Unsure","불확실"],["判通过","Judged pass","통과 판정"]],
+ch:["漏检率与 95% 置信区间（越低越好）","Miss rate with 95% CI (lower is better)","미검출률과 95% 신뢰구간(낮을수록 좋음)"],
+w1:["测试组人数少于 5：结论只代表这几个人和这个场景，请如实写明","Fewer than 5 test persons: results describe only these people and this setting; say so plainly","테스트 인원이 5명 미만입니다. 결과는 해당 인원·환경에만 해당하니 그대로 밝히세요"],
+w2:["总图片少于 200 张：置信区间会很宽","Fewer than 200 images in total: confidence intervals will be wide","전체 이미지가 200장 미만이라 신뢰구간이 넓습니다"],
+w3:["漏检为 0 不等于不会漏检：请看置信区间上限","Zero misses does not mean it never misses: read the upper end of the interval","미검출 0이 절대 놓치지 않는다는 뜻은 아닙니다. 구간 상한을 보세요"],
+w4:["请先填入数据","Enter data first","먼저 데이터를 입력하세요"]};
+var VD={r:[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]],lab:["","",""],p:0,ex:false};
+function wil(k,n){if(!n)return null;var z=1.96,p=k/n,d=1+z*z/n,c=(p+z*z/(2*n))/d,h=z*Math.sqrt(p*(1-p)/n+z*z/(4*n*n))/d;return[p,Math.max(0,c-h),Math.min(1,c+h)]}
+function pc(x){return(x*100).toFixed(1)+"%"}
+function ci(a){return a?pc(a[0])+" ["+pc(a[1])+"–"+pc(a[2])+"]":"-"}
+function grpName(i){return VD.lab[i]||t(U7.dg[i])}
+function valHTML(){var U=U7;return '<section id="val"><h2>'+t(U.vt)+'</h2><p class="sub">'+t(U.vs)+'</p><p><label>'+t(U.pn)+' <input type="number" min="0" id="vpn" value="'+VD.p+'" style="width:5em"></label></p><div class="sc"><table><tr><th>'+t(U.gp)+'</th>'+U.cl.map(function(x){return '<th>'+t(x)+'</th>'}).join("")+'</tr>'+VD.r.map(function(r,i){return '<tr><td><input type="text" data-l="'+i+'" value="'+grpName(i)+'" style="width:6em"></td>'+r.map(function(v,c){return '<td><input type="number" min="0" data-r="'+i+'" data-c="'+c+'" value="'+v+'" style="width:4.5em"></td>'}).join("")+'</tr>'}).join("")+'</table></div><div><button class="run" data-vx="ex">'+t(U.ex)+'</button><button class="run" data-vx="clr">'+t(U.cr)+'</button></div><div id="vout"></div></section>'}
+function paintVal(){var o=document.getElementById("vout");if(!o)return;var U=U7,S=[0,0,0,0,0,0],R=VD.r.map(function(r){r.forEach(function(v,i){S[i]+=v});return r}).concat([S]),H="";
+var N=S[0]+S[1]+S[2]+S[3]+S[4]+S[5];
+if(!N){o.innerHTML='<p>'+t(U.w4)+'</p>';return}
+if(VD.ex)H+='<div class="alarm"><b>'+t(U.eb)+'</b></div>';
+H+='<div class="sc"><table><tr><th>'+t(U.gp)+'</th>'+U.rc.map(function(x){return '<th>'+t(x)+'</th>'}).join("")+'</tr>';
+var bars=[],mx=0.1;
+R.forEach(function(r,i){var n0=r[0]+r[1]+r[2],n1=r[3]+r[4]+r[5],m=wil(r[2],n0),f=wil(r[5],n1),u=wil(r[1]+r[4],n0+n1);if(m){bars.push([i<3?grpName(i):t(U.tt),m]);if(m[2]>mx)mx=m[2]}
+H+='<tr'+(i===3?' style="font-weight:700"':'')+'><td>'+(i<3?grpName(i):t(U.tt))+'</td><td>'+n0+'</td><td>'+ci(m)+'</td><td>'+n1+'</td><td>'+ci(f)+'</td><td>'+ci(u)+'</td></tr>'});
+H+='</table></div><h3>'+t(U.mt)+'</h3><div class="sc"><table><tr><th></th>'+U.cj.map(function(x){return '<th>'+t(x)+'</th>'}).join("")+'</tr>';
+[[S[0],S[1],S[2]],[S[5],S[4],S[3]]].forEach(function(r,i){var n=r[0]+r[1]+r[2];H+='<tr><td>'+t(U.ra[i])+'</td>'+r.map(function(v){return '<td>'+v+(n?' ('+pc(v/n)+')':'')+'</td>'}).join("")+'</tr>'});
+H+='</table></div><h3>'+t(U.ch)+'</h3><svg viewBox="0 0 400 '+(bars.length*28+24)+'" width="100%" role="img" aria-label="CI">';
+mx=Math.min(1,Math.ceil(mx*20)/20);
+bars.forEach(function(b,i){var y=18+i*28,X=function(v){return 110+v/mx*270},m=b[1];H+='<text x="4" y="'+(y+4)+'" font-size="11" fill="var(--tx)">'+b[0]+'</text><line x1="'+X(m[1])+'" x2="'+X(m[2])+'" y1="'+y+'" y2="'+y+'" stroke="var(--ac)" stroke-width="3"/><circle cx="'+X(m[0])+'" cy="'+y+'" r="5" fill="var(--ac)"/><text x="'+(X(m[2])+6)+'" y="'+(y+4)+'" font-size="10" fill="var(--tx)">'+pc(m[0])+'</text>'});
+H+='<text x="110" y="'+(bars.length*28+14)+'" font-size="10" fill="var(--tx)">0%</text><text x="360" y="'+(bars.length*28+14)+'" font-size="10" fill="var(--tx)">'+Math.round(mx*100)+'%</text></svg>';
+if(!VD.p||VD.p<5)H+='<div class="warn">'+t(U.w1)+'</div>';if(N<200)H+='<div class="warn">'+t(U.w2)+'</div>';if(S[2]===0&&S[0]+S[1]>0)H+='<div class="warn">'+t(U.w3)+'</div>';
+o.innerHTML=H}
+function valAct(a){if(a==="ex"){VD.r=[[70,6,2,71,5,3],[58,10,7,60,12,8],[45,14,11,50,15,12]];VD.p=4;VD.ex=true}else{VD.r=[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]];VD.p=0;VD.ex=false}render()}
+document.getElementById("app").oninput=function(e){var el=e.target,r=el.getAttribute("data-r"),l=el.getAttribute("data-l");
+if(r!==null){VD.r[+r][+el.getAttribute("data-c")]=Math.max(0,parseInt(el.value,10)||0);VD.ex=false}else if(l!==null)VD.lab[+l]=el.value;else if(el.id==="vpn"){VD.p=Math.max(0,parseInt(el.value,10)||0);VD.ex=false}else if(el.getAttribute("data-k")!==null){VC.r[+el.getAttribute("data-k")][+el.getAttribute("data-kc")]=Math.max(0,parseInt(el.value,10)||0);VC.ex=false;paintCam();return}else if(el.id==="ptx"){VP.txt=el.value;VP.ex=false;paintPos();return}else if(el.id==="ptg"){VP.tg=parseFloat(el.value)||0;paintPos();return}else return;paintVal()};
+
+
+var U8={
+ct:["摄像头异常报警验证","Camera-fault alarm validation","카메라 이상 경보 검증"],
+cs:["对每种故障做若干次试验（每次约 30 秒，在镜头前真实制造故障），记录系统是否给出“镜头异常”提示；再做不制造故障的正常试验，看会不会乱报警。","Run several trials per fault (about 30 s each, really causing the fault in front of the lens) and record whether the system showed a camera-problem warning; also run normal trials with no fault to see whether it cries wolf.","고장별로 여러 번(회당 약 30초) 실제로 고장을 만들어 시험하고 ‘카메라 이상’ 경고 여부를 기록하세요. 고장이 없는 정상 시험도 해서 오경보를 확인합니다."],
+cg:[["遮挡镜头","Blocked lens","렌즈 가림"],["画面过暗","Too dark","너무 어두움"],["画面停住","Frozen video","영상 정지"],["镜头模糊（涂抹）","Blurred lens","렌즈 흐림"],["正常（不应报警）","Normal (should not alarm)","정상(경보 없어야 함)"]],
+ch:[["情形","Case","상황"],["试验次数","Trials","시험 횟수"],["被报警次数","Alarmed","경보 횟수"],["比例 [95% 区间]","Rate [95% CI]","비율 [95% 구간]"]],
+cp:["故障合计检出率","All faults: detection rate","고장 합계 검출률"],cf:["正常试验误报率","Normal trials: false-alarm rate","정상 시험 오경보율"],
+cw:["正常试验少于 20 次：误报率区间会很宽；也要覆盖不同光线和人员走动","Fewer than 20 normal trials: the false-alarm interval will be wide; cover different lighting and people moving","정상 시험이 20회 미만이면 오경보 구간이 넓습니다. 다양한 조명과 사람 움직임을 포함하세요"],
+pt:["定位精度验证","Positioning accuracy validation","측위 정확도 검증"],
+ps:["在地面用卷尺标出测试点，让人带手表逐点站立，把“系统给出的位置与真实位置的距离”（米）逐个填入，用逗号、空格或换行分隔。","Mark test points on the floor with a tape measure, have someone wear the watch and stand on each, then enter the distance in metres between the reported and true position, separated by commas, spaces or new lines.","바닥에 줄자로 시험 지점을 표시하고 워치를 착용한 사람이 각 지점에 서서, 보고된 위치와 실제 위치의 거리(m)를 쉼표·공백·줄바꿈으로 구분해 입력하세요."],
+pg:["目标误差（米）","Target error (m)","목표 오차(m)"],
+pr:[["样本数","Samples","표본 수"],["平均误差","Mean error","평균 오차"],["中位数","Median","중앙값"],["90 分位数","90th percentile","90 백분위"],["最大值","Max","최댓값"],["在目标内的比例 [95% 区间]","Within target [95% CI]","목표 이내 비율 [95% 구간]"]],
+pc:["累积分布（越靠左上越好）","Cumulative distribution (closer to the top left is better)","누적 분포(왼쪽 위에 가까울수록 좋음)"],
+pw:["样本少于 30 个：只能说明这几个点；请写明测试区域和点位数","Fewer than 30 samples: describes only these points; state the test area and number of points","표본이 30개 미만입니다. 해당 지점에만 해당하니 시험 구역과 지점 수를 밝히세요"],
+pe:["请先输入数据","Enter data first","먼저 데이터를 입력하세요"]};
+var VC={r:[[0,0],[0,0],[0,0],[0,0],[0,0]],ex:false},VP={txt:"",tg:2,ex:false};
+function exB(){return '<div class="alarm"><b>'+t(U7.eb)+'</b></div>'}
+function camHTML(){var U=U8;return '<section id="vcam"><h2>'+t(U.ct)+'</h2><p class="sub">'+t(U.cs)+'</p><div class="sc"><table><tr>'+U.ch.slice(0,3).map(function(x){return '<th>'+t(x)+'</th>'}).join("")+'</tr>'+VC.r.map(function(r,i){return '<tr><td>'+t(U.cg[i])+'</td>'+r.map(function(v,c){return '<td><input type="number" min="0" data-k="'+i+'" data-kc="'+c+'" value="'+v+'" style="width:5em"></td>'}).join("")+'</tr>'}).join("")+'</table></div><div><button class="run" data-cx="ex">'+t(U7.ex)+'</button><button class="run" data-cx="clr">'+t(U7.cr)+'</button></div><div id="cout"></div></section>'}
+function paintCam(){var o=document.getElementById("cout");if(!o)return;var U=U8,sn=0,sk=0,H="",bad=false;VC.r.forEach(function(r,i){if(i<4){sn+=r[0];sk+=r[1]}if(r[1]>r[0])bad=true});
+if(!sn&&!VC.r[4][0]){o.innerHTML='<p>'+t(U7.w4)+'</p>';return}
+if(bad){o.innerHTML='<div class="warn">'+t(U8.pe)+' (alarmed &gt; trials)</div>';return}
+H+=VC.ex?exB():"";H+='<div class="sc"><table><tr>'+U.ch.map(function(x){return '<th>'+t(x)+'</th>'}).join("")+'</tr>';
+VC.r.forEach(function(r,i){H+='<tr><td>'+t(U.cg[i])+'</td><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+ci(wil(r[1],r[0]))+'</td></tr>'});
+H+='<tr style="font-weight:700"><td>'+t(U.cp)+'</td><td>'+sn+'</td><td>'+sk+'</td><td>'+ci(wil(sk,sn))+'</td></tr><tr style="font-weight:700"><td>'+t(U.cf)+'</td><td>'+VC.r[4][0]+'</td><td>'+VC.r[4][1]+'</td><td>'+ci(wil(VC.r[4][1],VC.r[4][0]))+'</td></tr></table></div>';
+if(VC.r[4][0]<20)H+='<div class="warn">'+t(U.cw)+'</div>';o.innerHTML=H}
+function camAct(a){VC.r=a==="ex"?[[20,19],[20,18],[20,14],[20,12],[40,2]]:[[0,0],[0,0],[0,0],[0,0],[0,0]];VC.ex=a==="ex";render()}
+function posHTML(){var U=U8;return '<section id="vpos"><h2>'+t(U.pt)+'</h2><p class="sub">'+t(U.ps)+'</p><p><label>'+t(U.pg)+' <input type="number" min="0" step="0.1" id="ptg" value="'+VP.tg+'" style="width:5em"></label></p><textarea id="ptx" rows="4" style="width:100%;max-width:520px">'+VP.txt+'</textarea><div><button class="run" data-px="ex">'+t(U7.ex)+'</button><button class="run" data-px="clr">'+t(U7.cr)+'</button></div><div id="pout"></div></section>'}
+function paintPos(){var o=document.getElementById("pout");if(!o)return;var U=U8,a=VP.txt.split(/[\s,;，、]+/).map(parseFloat).filter(function(x){return isFinite(x)&&x>=0}).sort(function(x,y){return x-y}),n=a.length;
+if(!n){o.innerHTML='<p>'+t(U.pe)+'</p>';return}
+var m=a.reduce(function(s,x){return s+x},0)/n,md=n%2?a[(n-1)/2]:(a[n/2-1]+a[n/2])/2,p9=a[Math.ceil(0.9*n)-1],mx=a[n-1],k=a.filter(function(x){return x<=VP.tg}).length,f=function(x){return x.toFixed(2)+" m"},
+V=[n,f(m),f(md),f(p9),f(mx),ci(wil(k,n))],H=VP.ex?exB():"";
+H+='<div class="sc"><table>'+U.pr.map(function(x,i){return '<tr><th>'+t(x)+'</th><td>'+V[i]+'</td></tr>'}).join("")+'</table></div><h3>'+t(U.pc)+'</h3><svg viewBox="0 0 400 150" width="100%" role="img" aria-label="CDF"><rect x="40" y="10" width="340" height="100" fill="none" stroke="#8a94a3" stroke-opacity=".6"/>';
+var sx=function(v){return 40+v/Math.max(mx,VP.tg,0.1)*340},pts=a.map(function(v,i){return sx(v).toFixed(1)+","+(110-(i+1)/n*100).toFixed(1)}).join(" ");
+H+='<polyline points="40,110 '+pts+'" fill="none" stroke="var(--ac)" stroke-width="2.5"/><line x1="'+sx(VP.tg)+'" x2="'+sx(VP.tg)+'" y1="10" y2="110" stroke="#c2332b" stroke-dasharray="4 3"/><text x="38" y="14" font-size="10" text-anchor="end" fill="var(--tx)">100%</text><text x="38" y="112" font-size="10" text-anchor="end" fill="var(--tx)">0</text><text x="40" y="126" font-size="10" fill="var(--tx)">0 m</text><text x="380" y="126" font-size="10" text-anchor="end" fill="var(--tx)">'+Math.max(mx,VP.tg,0.1).toFixed(1)+' m</text></svg>';
+if(n<30)H+='<div class="warn">'+t(U.pw)+'</div>';o.innerHTML=H}
+function posAct(a){VP.txt=a==="ex"?"0.4, 0.6, 0.5, 0.8, 1.1, 0.7, 0.9, 1.4, 0.6, 0.5, 1.8, 0.9, 1.2, 2.3, 0.7, 0.8, 1.0, 1.6, 0.5, 0.9, 2.9, 1.1, 0.6, 0.7, 1.3, 0.8, 1.9, 0.4, 1.0, 3.4":"";VP.ex=a==="ex";render()}
+
+function dspHTML(){var U=U3;return '<section id="dsp"><h2>'+t(U.dt)+'</h2><p class="sub">'+t(U.ds)+'</p><div><button class="run" id="dr">'+t(U.run)+'</button><button class="run" id="dv">'+t(U.vt)+'</button></div><div class="bar"><i id="dbr" class="l1"></i></div><p><b id="dtm"></b> <span id="dvm" class="bad"></span></p><ol class="l" id="dls"></ol><div id="dhp"></div><p><b>'+t(U.ch)+'</b></p><ul class="l" id="dch"></ul></section>'}
+function paintDsp(){var l=document.getElementById("dls");if(!l)return;var T=[1.2,3,5,8,10];
+document.getElementById("dtm").textContent=DS.t.toFixed(1)+" s / 10.0 s";document.getElementById("dbr").style.width=Math.min(100,DS.t*10)+"%";
+document.getElementById("dvm").textContent=DS.veto?t(U3.vd):"";
+l.innerHTML=U3.st.map(function(x,i){return '<li style="'+(i<DS.done?'font-weight:700;color:var(--ok)':'color:var(--mu)')+'">'+(i<DS.done?'✓ ':'')+T[i].toFixed(1)+' s · '+t(x)+'</li>'}).join("");
+var best=-1,bs=1e9,rows=HOSP.map(function(h,i){var s=h[1]-0.2*h[2]-2*h[3];if(s<bs){bs=s;best=i}return s});
+document.getElementById("dhp").innerHTML=DS.done>=5?'<p>'+t(U3.hh)+'</p><div class="sc"><table><tr><th>'+t(U3.hn)+'</th><th>km</th><th>beds</th><th>spec.</th><th>score</th></tr>'+HOSP.map(function(h,i){return '<tr'+(i===best?' style="font-weight:700"':'')+'><td>'+h[0]+(i===best?' ★ '+t(U3.hb):'')+'</td><td>'+h[1]+'</td><td>'+h[2]+'</td><td>'+h[3]+'</td><td>'+rows[i].toFixed(1)+'</td></tr>'}).join("")+'</table></div>':"";
+document.getElementById("dch").innerHTML=DS.chain.map(function(h,i){return h?'<li><code>'+(i+1)+' · '+h.slice(0,16)+'…</code></li>':""}).join("")}
+function sha(s){try{return crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)).then(function(b){return Array.prototype.map.call(new Uint8Array(b),function(x){return("0"+x.toString(16)).slice(-2)}).join("")})}catch(e){var h=2166136261,i;for(i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return Promise.resolve(("00000000"+(h>>>0).toString(16)).slice(-8).repeat(8))}}
+function dspStart(){DS.run=true;DS.t=0;DS.done=0;DS.veto=false;DS.chain=[];DS.last="genesis";DS.p=Promise.resolve();paintDsp()}
+function tickDsp(){if(!DS.run)return;DS.t+=0.1;var T=[1.2,3,5,8,10],k;while(DS.done<5&&DS.t>=T[DS.done]-0.001){k=DS.done;DS.done++;(function(k){DS.p=DS.p.then(function(){return sha(DS.last+"|"+k+"|"+T[k])}).then(function(h){DS.last=h;DS.chain[k]=h;paintDsp()})})(k)}
+if(DS.t>=10)DS.run=false;paintDsp()}
+function recHTML(){var U=U3;return '<section id="rec"><h2>'+t(U.rt)+'</h2><p class="sub">'+t(U.rsub)+'</p><div class="g">'+[0,1,2].map(function(i){var r=U.rx.slice(i*4,i*4+4);return '<button class="c pl" data-r="'+i+'" style="text-align:left;font:inherit;color:var(--tx);cursor:pointer"><b>'+t(r[0])+' · '+t(r[1])+'</b><span>'+t(r[2])+'</span><br><span>'+r[3]+' min</span><br><b id="rt'+i+'"></b></button>'}).join("")+'</div><div class="warn">'+t(U.rn)+'</div></section>'}
+function paintRec(){for(var i=0;i<3;i++){var e=document.getElementById("rt"+i);if(e)e.textContent=RC.i===i?("0"+Math.floor(RC.left/60)).slice(-2)+":"+("0"+RC.left%60).slice(-2):""}}
+function bindX(){var q=function(i,f){var e=document.getElementById(i);if(e)e.onclick=f};
+q("cj",function(){var w=WK[0];w.base=138;w.bsp=91;w.bh=false});q("cz",function(){wkInit();ALERTS=[];paintCtr()});
+q("dr",dspStart);q("dv",function(){if(DS.run){DS.run=false;DS.veto=true;paintDsp()}});
+var rb=document.querySelectorAll("button[data-r]");for(var k=0;k<rb.length;k++)(function(b){b.onclick=function(){RC.i=+b.getAttribute("data-r");RC.left=U3.rx[RC.i*4+3]*60;paintRec()}})(rb[k]);
+paintCtr();paintDsp();paintRec();rp()}
+setInterval(tickCtr,1000);setInterval(tickDsp,100);setInterval(function(){if(RC.i>=0&&RC.left>0){RC.left--;paintRec()}},1000);
+function t(a){return a[cur]}
+function pct(x){return (x*100).toFixed(1)+"%"}
+function pm(o){return pct(o.m)+" ± "+pct(o.s)}
+function render(){
+ document.documentElement.lang=["zh-CN","en","ko"][cur];
+ document.getElementById("h1").textContent=t(T.h1);document.getElementById("hp").textContent=t(T.hp);document.getElementById("bd").textContent=t(T.bd);document.getElementById("ft").textContent=t(T.ft);document.title=t(T.h1);
+ document.getElementById("nav").innerHTML='<span>'+U4.nv.map(function(x,i){return '<button class="run sc'+((i===0)===(VIEW==="m")?' sel':'')+'" data-v="'+(i?'w':'m')+'">'+t(x)+'</button>'}).join("")+'</span>'+(VIEW==="m"?NAV.map(function(n){return '<a href="#'+n[0]+'">'+t(n[1])+'</a>'}).join(""):"");
+ var h=pilHTML(),s=SEC.land;
+ h+='<section id="land"><h2>'+t(s.t)+'</h2><p class="sub">'+t(s.s)+'</p><div class="g">'+s.st.map(function(x){return '<div class="st"><b>'+x[0]+'</b><span>'+t(x[1])+'</span></div>'}).join("")+'</div><p>'+t(s.txt)+'</p></section>';
+ s=SEC.reg;
+ h+='<section id="reg"><h2>'+t(s.t)+'</h2><p class="sub">'+t(s.s)+'</p><div class="sc"><table><tr>'+s.head.map(function(x){return '<th>'+t(x)+'</th>'}).join("")+'</tr>'+s.rows.map(function(r){return '<tr>'+r.map(function(c){return '<td>'+t(c)+'</td>'}).join("")+'</tr>'}).join("")+'</table></div></section>';
+ s=SEC.arch;
+ h+='<section id="arch"><h2>'+t(s.t)+'</h2><p class="sub">'+t(s.s)+'</p><div class="flow">'+s.flow.map(function(f){return '<div><b>'+t(f[0])+'</b>'+t(f[1])+'</div>'}).join("")+'</div><div class="warn">'+t(s.warn)+'</div></section>';
+ h+=liveHTML()+visionHTML()+mapHTML()+ctrHTML()+dspHTML()+recHTML()+appHTML()+valHTML()+camHTML()+posHTML()+limHTML();s=SEC.sim;
+ h+='<section id="sim"><h2>'+t(s.t)+'</h2><p class="sub">'+t(s.s)+'</p><p>'+t(UI.steps)+'</p><p>'+t(UI.seed)+' <input id="sd" type="number" value="7" min="1"> '+t(UI.n)+' <input id="nn" type="number" value="1500" min="1200" max="6000" step="100"></p><button class="run" id="b1">'+t(UI.run)+'</button><button class="run" id="b2">'+t(UI.multi)+'</button><div id="out" aria-live="polite"></div></section>';
+ h+='<section id="road"><h2>'+t(ROAD.t)+'</h2><p class="sub">'+t(ROAD.s)+'</p><ul class="l">'+ROAD.it.map(function(x){return '<li>'+t(x)+'</li>'}).join("")+'</ul></section>';
+ h+='<section id="case"><h2>'+t(CASE.t)+'</h2><p class="sub">'+t(CASE.s)+'</p><div class="g">'+CASE.it.map(function(x){return '<div class="c"><span>'+t(x)+'</span></div>'}).join("")+'</div></section>';
+ h+='<section id="src"><h2>'+["文献来源","Sources","참고문헌"][cur]+'</h2><ul class="l">'+SRC.map(function(x){return '<li><a href="'+x[0]+'" target="_blank" rel="noopener noreferrer">'+x[1]+'</a></li>'}).join("")+'</ul></section>';
+ if(VIEW==="w"){document.getElementById("app").innerHTML=wvHTML();paintW()}else{document.getElementById("app").innerHTML=h;document.getElementById("b1").onclick=doRun;document.getElementById("b2").onclick=doMulti;bindLV();paintLV();bindX();paintVal();paintCam();paintPos()}
+ var bs=document.querySelectorAll(".lang button");for(var i=0;i<bs.length;i++)bs[i].className=(L.indexOf(bs[i].getAttribute("data-l"))===cur)?"on":"";
+}
+function val(id,d){var v=parseInt(document.getElementById(id).value,10);return isNaN(v)?d:v}
+function doRun(){
+ var seed=val("sd",7),N=Math.min(6000,Math.max(1200,val("nn",1500))),r=runCV(seed,N),f=r.folds,i;
+ var rows=f.map(function(x,k){return '<tr><td>'+(k+1)+'</td><td>'+pct(x.m.f1)+'</td><td>'+pct(x.rule.f1)+'</td><td>'+pct(x.m.p)+'</td><td>'+pct(x.m.r)+'</td><td>'+pct(x.m.fpr)+'</td></tr>'}).join("");
+ var A={f1:agg(f,"f1","m"),rf:agg(f,"f1","rule"),p:agg(f,"p","m"),r:agg(f,"r","m"),fp:agg(f,"fpr","m")};
+ var bars="",W=60;
+ for(i=0;i<f.length;i++){var h1=f[i].m.f1*100,h2=f[i].rule.f1*100;bars+='<rect x="'+(20+i*W)+'" y="'+(110-h1)+'" width="22" height="'+h1+'" fill="var(--ac)"/><rect x="'+(44+i*W)+'" y="'+(110-h2)+'" width="22" height="'+h2+'" fill="var(--mu)"/><text x="'+(34+i*W)+'" y="126" font-size="11" fill="currentColor">'+t(UI.fold)+(i+1)+'</text>'}
+ var ty=[0,0,0,0,0],tt=[0,0,0,0,0];
+ for(i=0;i<f.length;i++)for(var k=1;k<=4;k++){ty[k]+=f[i].ty[k][0];tt[k]+=f[i].ty[k][1]}
+ var tl=UI.tn.map(function(n,k){return t(n)+": "+(tt[k+1]?pct(ty[k+1]/tt[k+1]):"-")}).join(" · ");
+ var raw=N*24,up=r.alerts*32+Math.ceil(N/60)*32,red=Math.max(0,100*(1-up/raw));
+ document.getElementById("out").innerHTML='<div class="sc"><table><tr><th>'+t(UI.fold)+'</th><th>'+t(UI.mod)+'</th><th>'+t(UI.rule)+'</th><th>'+t(UI.prec)+'</th><th>'+t(UI.rec)+'</th><th>'+t(UI.fpr)+'</th></tr>'+rows+'<tr><th>'+t(UI.mean)+'</th><th>'+pm(A.f1)+'</th><th>'+pm(A.rf)+'</th><th>'+pm(A.p)+'</th><th>'+pm(A.r)+'</th><th>'+pm(A.fp)+'</th></tr></table></div><svg viewBox="0 0 330 135" width="100%" style="max-width:480px;color:var(--tx)" role="img" aria-label="F1">'+bars+'</svg><p><span class="ok">■</span> '+t(UI.mod)+' &nbsp; <span style="color:var(--mu)">■</span> '+t(UI.rule)+'</p><p><b>'+t(UI.types)+'</b><br>'+tl+'</p><p>'+t(UI.red)+' <b>'+red.toFixed(0)+'%</b> ('+t(UI.ms)+': '+(raw/1024).toFixed(1)+' KB → '+(up/1024).toFixed(1)+' KB)</p><div class="warn">'+t(UI.note)+'</div>';
+}
+function doMulti(){
+ var N=Math.min(6000,Math.max(1200,val("nn",1500))),m=multi(10,N);
+ var el=document.createElement("p");el.innerHTML='<b>'+t(UI.ro)+'</b> (n='+m.n+', N='+N+'): F1 '+pct(m.m)+' ± '+pct(m.s)+' [min '+pct(m.min)+', max '+pct(m.max)+']';
+ document.getElementById("out").appendChild(el);
+}
+var bs=document.querySelectorAll(".lang button");
+for(var q=0;q<bs.length;q++){(function(b){b.onclick=function(){cur=L.indexOf(b.getAttribute("data-l"));try{localStorage.setItem("lang",b.getAttribute("data-l"))}catch(e){}render()}})(bs[q])}
+(function(){var s=null;try{s=localStorage.getItem("lang")}catch(e){}var n=(s||navigator.language||"ko").toLowerCase();cur=n.indexOf("zh")===0?0:n.indexOf("en")===0?1:2;render()})();
+</script>
+</body>
+</html>
